@@ -125,7 +125,7 @@ export default function Home() {
               </p>
 
               {/* Trust Badges */}
-              <div className="flex flex-wrap gap-3 mb-8">
+              <div className="flex flex-wrap gap-3 mb-6">
                 {trustBadges.map((badge, i) => (
                   <div 
                     key={i} 
@@ -135,6 +135,26 @@ export default function Home() {
                       <badge.icon className="w-3.5 h-3.5" />
                     </div>
                     {badge.text}
+                  </div>
+                ))}
+              </div>
+
+              {/* Hospital Affiliations */}
+              <div className="flex flex-wrap gap-2 mb-8">
+                <span className="text-xs font-medium text-slate-400 py-1">Ancien:</span>
+                {hospitalAffiliations.map((hospital, i) => (
+                  <div 
+                    key={i}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm text-xs font-medium text-slate-600 hover:border-indigo-200 hover:text-indigo-600 transition-all cursor-default"
+                  >
+                    <Building className="w-3 h-3 text-slate-400" />
+                    {hospital.name}
+                    {hospital.years !== 'Ancien' && (
+                      <span className="text-slate-300">•</span>
+                    )}
+                    {hospital.years !== 'Ancien' && (
+                      <span className="text-emerald-500 font-semibold">{hospital.years}</span>
+                    )}
                   </div>
                 ))}
               </div>
