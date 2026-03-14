@@ -534,17 +534,17 @@ export default function Home() {
               { name: 'BIAT', logo: '/biat_logo.png' },
               { name: 'STAR', logo: '/star_logo.png' },
             ].map((insurance) => (
-              <div key={insurance.name} className="group bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default premium-card">
+              <div key={insurance.name} className="insurance-grid-item group bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default premium-card">
                 <div className="text-center">
                   <div className="h-12 flex items-center justify-center mb-2">
                     <img 
                       src={insurance.logo} 
                       alt={insurance.name}
                       loading="lazy"
-                      className="max-h-10 max-w-full object-contain grayscale group-hover:grayscale-0 transition-all"
+                      className="max-h-10 max-w-full object-contain md:grayscale md:group-hover:grayscale-0 md:transition-all md:duration-300"
                     />
                   </div>
-                  <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-800 transition-colors">{insurance.name}</span>
+                  <span className="text-sm font-semibold text-slate-600 md:group-hover:text-slate-800 md:transition-colors">{insurance.name}</span>
                 </div>
               </div>
             ))}

@@ -1186,3 +1186,23 @@ input, textarea, select {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #6366f1, #8b5cf6);
 }
+
+/* ========== MOBILE INSURANCE HIGHLIGHT ========== */
+
+@media (max-width: 767px) {
+  @keyframes highlightInsurance {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    50% { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); }
+  }
+  
+  .insurance-grid-item {
+    animation: highlightInsurance 3s ease-in-out infinite;
+  }
+  
+  .insurance-grid-item:nth-child(1) { animation-delay: 0s; }
+  .insurance-grid-item:nth-child(2) { animation-delay: 0.5s; }
+  .insurance-grid-item:nth-child(3) { animation-delay: 1s; }
+  .insurance-grid-item:nth-child(4) { animation-delay: 1.5s; }
+  .insurance-grid-item:nth-child(5) { animation-delay: 2s; }
+  .insurance-grid-item:nth-child(6) { animation-delay: 2.5s; }
+}
