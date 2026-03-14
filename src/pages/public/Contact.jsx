@@ -24,7 +24,7 @@ export default function Contact() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm text-xs font-semibold text-indigo-600 mb-6">
               <Sparkles className="w-3.5 h-3.5" />
-             Contactez-nous
+              Contactez-nous
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-5">
               Nous{' '}
@@ -65,8 +65,22 @@ export default function Contact() {
                   rel="noopener noreferrer"
                   className="no-underline"
                 >
-                  <Button variant="accent" icon={MessageCircle} className="w-full shadow-lg shadow-teal-500/25 hover:shadow-teal-500/30 hover:-translate-y-1 transition-all">
+                  <Button variant="whatsapp" size="lg" className="w-full shadow-lg shadow-green-500/25 hover:shadow-green-500/30 hover:-translate-y-1 transition-all">
+                    <MessageCircle className="w-5 h-5" />
                     Discuter sur WhatsApp
+                  </Button>
+                </a>
+              </div>
+
+              {/* Additional contact option */}
+              <div className="pt-2">
+                <a
+                  href={`tel:${doctor.contact.phone2}`}
+                  className="no-underline"
+                >
+                  <Button variant="secondary" size="lg" className="w-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+                    <Phone className="w-5 h-5" />
+                    Appel direct: {doctor.contact.phone2}
                   </Button>
                 </a>
               </div>
