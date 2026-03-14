@@ -68,7 +68,7 @@ export default function PublicNavbar() {
                 Espace Medecin
               </Button>
             </Link>
-            <PulsingCTA delay={5000} interval={5000}>
+            <PulsingCTA delay={3000} interval={1000}>
               <Link to="/book" className="no-underline">
                 <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all border-0">
                   Prendre RDV

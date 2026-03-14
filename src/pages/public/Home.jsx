@@ -577,7 +577,7 @@ export default function Home() {
                 Planifiez votre consultation en ligne. Creneaux disponibles mis a jour en temps reel.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <PulsingCTA delay={3000} interval={3000}>
+                <PulsingCTA delay={0} interval={0}>
                   <Link to="/book" className="no-underline">
                     <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50 hover:scale-105 transition-all shadow-xl shadow-black/20 border-0 font-bold">
                       <Calendar className="w-5 h-5" />
