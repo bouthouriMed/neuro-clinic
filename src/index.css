@@ -1187,6 +1187,103 @@ input, textarea, select {
   background: linear-gradient(180deg, #6366f1, #8b5cf6);
 }
 
+/* ========== SITE PRELOADER ========== */
+
+.preloader-ring {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 2px solid rgba(99, 102, 241, 0.1);
+  border-top-color: rgba(129, 140, 248, 0.8);
+  border-right-color: rgba(99, 102, 241, 0.3);
+  animation: preloader-spin 1.2s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+}
+
+@keyframes preloader-spin {
+  to { transform: rotate(360deg); }
+}
+
+.preloader-bar {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, #818cf8, transparent);
+  border-radius: 9999px;
+  animation: preloader-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes preloader-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* ========== HERO VIDEO ========== */
+
+.hero-video-overlay {
+  background:
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.35) 40%, rgba(15, 23, 42, 0.5) 70%, rgba(255, 255, 255, 0) 100%),
+    linear-gradient(to right, rgba(15, 23, 42, 0.4) 0%, transparent 60%);
+}
+
+/* Shimmer effect for loader */
+.hero-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 60%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Loader ring */
+.hero-loader-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin-slow 1.5s linear infinite;
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Content entrance animation */
+.hero-content-enter {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-content-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  .hero-shimmer,
+  .hero-loader-ring {
+    animation: none;
+  }
+
+  .hero-content-enter {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .hero-video-section video {
+    animation: none;
+  }
+}
+
 /* ========== MOBILE INSURANCE HIGHLIGHT ========== */
 
 @media (max-width: 767px) {
