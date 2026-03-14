@@ -55,7 +55,7 @@ export default function BookAppointment() {
   return (
     <>
       {/* Header */}
-      <section className="relative overflow-hidden" style={{ paddingTop: '100px' }}>
+      <section className="relative overflow-hidden" style={{ paddingTop: '20px' }}>
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30" />
         <div className="absolute inset-0 grid-pattern opacity-50" />
 

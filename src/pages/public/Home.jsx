@@ -92,7 +92,7 @@ export default function Home() {
   return (
     <div style={{ overflowX: 'hidden' }}>
       {/* ===== HERO ===== */}
-      <section className="relative min-h-screen flex items-center overflow-hidden" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
+      <section className="relative min-h-screen flex items-center overflow-hidden" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
         {/* Background layers */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50/40" />
         <div className="absolute inset-0 dot-pattern opacity-40" />
