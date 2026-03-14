@@ -89,14 +89,28 @@ export default function Contact() {
                 </a>
               </div>
 
-              {/* Map placeholder */}
-              <div className="mt-4 w-full h-56 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden">
-                <div className="text-center">
-                  <MapPin className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                  <span className="text-sm text-slate-400 font-medium">Intégration Google Maps</span>
-                  <p className="text-xs text-slate-300 mt-1">La carte interactive apparaîtra ici</p>
-                </div>
+              {/* Map */}
+              <div className="mt-4 w-full h-72 rounded-2xl overflow-hidden border border-slate-200 shadow-lg">
+                <iframe
+                  src={doctor.contact.googleMapsEmbed}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, filter: 'grayscale(20%) contrast(1.05)' }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Localisation - Cabinet de Neurologie Dr Abir Bouthouri"
+                />
               </div>
+              <a 
+                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(doctor.contact.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                <MapPin className="w-4 h-4" />
+                Itinéraire vers le cabinet
+              </a>
             </div>
 
             {/* Right — Form */}

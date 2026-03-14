@@ -39,6 +39,7 @@ export const doctor = {
     email: 'cab.neurologie@gmail.com',
     phone2: '+216 55 175 560',
     hours: 'Lun - Ven: 8h30 - 17h00 | Sam: 9h00 - 13h00',
+    googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3331.6105757629966!2d10.6279793!3d35.830927!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1302752c95540609%3A0x3ac3cfa8e62d81c0!2sCabinet%20de%20Neurologie%20Dr%20Abir%20Bouthouri!5e1!3m2!1sfr!2stn!4v1773465489677!5m2!1sfr!2stn"
   },
 }
 
