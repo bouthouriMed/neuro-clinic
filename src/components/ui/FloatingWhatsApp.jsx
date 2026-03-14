@@ -5,7 +5,9 @@ import { doctor } from '../../data/mockData'
 export default function FloatingWhatsApp() {
   const [isOpen, setIsOpen] = useState(false)
 
-  const phoneNumber = doctor.contact.whatsapp.replace(/\s+/g, '')
+  const phoneNumber = doctor.contact.whatsapp.replace(/\s+/g, '').replace(/\+/g, '')
+  const defaultMessage = "Bonjour Dr. Abir Bouthouri, je souhaiterais prendre rendez-vous pour une consultation neurologique."
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`
   
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -36,7 +38,7 @@ export default function FloatingWhatsApp() {
 
       {/* Main Button - Round & Transparent */}
       <a
-        href={`https://wa.me/${phoneNumber}`}
+        href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 hover:scale-110 transition-all group"

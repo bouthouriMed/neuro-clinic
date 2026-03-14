@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Brain, Phone, Mail, MapPin, Clock } from 'lucide-react'
+import { Brain, Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react'
 import { doctor } from '../../data/mockData'
 
 export default function PublicFooter() {
@@ -21,9 +21,15 @@ export default function PublicFooter() {
               Soins neurologiques modernes avec une touche personnelle. Diagnostic expert et traitement pour toutes les conditions neurologiques.
             </p>
             <div className="flex gap-3">
-              <a href={`https://wa.me/${doctor.contact.whatsapp.replace(/\s+/g, '')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-indigo-600 flex items-center justify-center transition-all hover:scale-110">
-                <Phone className="w-4 h-4" />
-              </a>
+              {(() => {
+                const phone = doctor.contact.whatsapp.replace(/\s+/g, '').replace(/\+/g, '')
+                const msg = encodeURIComponent("Bonjour Dr. Abir Bouthouri, je souhaiterais prendre rendez-vous pour une consultation neurologique.")
+                return (
+                  <a href={`https://wa.me/${phone}?text=${msg}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-green-600 flex items-center justify-center transition-all hover:scale-110">
+                    <MessageCircle className="w-4 h-4" />
+                  </a>
+                )
+              })()}
               <a href={`mailto:${doctor.contact.email}`} className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-indigo-600 flex items-center justify-center transition-all hover:scale-110">
                 <Mail className="w-4 h-4" />
               </a>

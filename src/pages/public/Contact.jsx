@@ -12,6 +12,10 @@ const contactInfo = [
 ]
 
 export default function Contact() {
+  const phoneNumber = doctor.contact.whatsapp.replace(/\s+/g, '').replace(/\+/g, '')
+  const defaultMessage = "Bonjour Dr. Abir Bouthouri, je souhaiterais prendre rendez-vous pour une consultation neurologique."
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(defaultMessage)}`
+
   return (
     <>
       {/* Hero */}
@@ -60,7 +64,7 @@ export default function Contact() {
 
               <div className="pt-2">
                 <a
-                  href={`https://wa.me/${doctor.contact.whatsapp.replace(/\s+/g, '')}`}
+                  href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="no-underline"
