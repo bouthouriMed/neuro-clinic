@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Brain, ChevronRight } from 'lucide-react'
 import Button from '../ui/Button'
+import PulsingCTA from '../ui/PulsingCTA'
 
 const links = [
   { to: '/', label: 'Accueil' },
@@ -67,11 +68,13 @@ export default function PublicNavbar() {
                 Espace Medecin
               </Button>
             </Link>
-            <Link to="/book" className="no-underline">
-              <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all border-0">
-                Prendre RDV
-              </Button>
-            </Link>
+            <PulsingCTA delay={5000} interval={5000}>
+              <Link to="/book" className="no-underline">
+                <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all border-0">
+                  Prendre RDV
+                </Button>
+              </Link>
+            </PulsingCTA>
           </div>
 
           {/* Mobile Toggle */}
@@ -105,11 +108,13 @@ export default function PublicNavbar() {
             </Link>
           ))}
           <div className="pt-3 border-t border-slate-100 mt-2">
-            <Link to="/book" onClick={() => setOpen(false)} className="no-underline">
-              <Button className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
-                Prendre RDV
-              </Button>
-            </Link>
+            <PulsingCTA delay={5000} interval={5000}>
+              <Link to="/book" onClick={() => setOpen(false)} className="no-underline">
+                <Button className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white border-0 shadow-lg shadow-indigo-500/20">
+                  Prendre RDV
+                </Button>
+              </Link>
+            </PulsingCTA>
           </div>
         </div>
       </div>

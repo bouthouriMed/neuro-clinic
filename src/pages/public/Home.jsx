@@ -22,11 +22,13 @@ import {
   Users,
 } from 'lucide-react'
 import Button from '../../components/ui/Button'
+import PulsingCTA from '../../components/ui/PulsingCTA'
 import { services, testimonials, insurances, doctor } from '../../data/mockData'
 
 export default function Home() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [statsAnimated, setStatsAnimated] = useState(false)
+  const [revealedSections, setRevealedSections] = useState({})
 
   // Auto-advance testimonials
   useEffect(() => {
@@ -49,6 +51,29 @@ export default function Home() {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Scroll reveal observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !revealedSections[entry.target.id]) {
+            setRevealedSections((prev) => ({
+              ...prev,
+              [entry.target.id]: true,
+            }))
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    )
+
+    document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+      observer.observe(el)
+    })
+
+    return () => observer.disconnect()
   }, [])
 
   const nextTestimonial = () => {
@@ -161,12 +186,14 @@ export default function Home() {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4 mb-12">
-                <Link to="/book" className="no-underline">
-                  <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white border-0 shadow-xl shadow-indigo-500/25 hover:shadow-2xl hover:shadow-indigo-500/30 hover:-translate-y-1 transition-all group">
-                    Prendre RDV
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  </Button>
-                </Link>
+                <PulsingCTA delay={5000} interval={5000}>
+                  <Link to="/book" className="no-underline">
+                    <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white border-0 shadow-xl shadow-indigo-500/25 hover:shadow-2xl hover:shadow-indigo-500/30 hover:-translate-y-1 transition-all group">
+                      Prendre RDV
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                    </Button>
+                  </Link>
+                </PulsingCTA>
                 <Link to="/about" className="no-underline">
                   <Button variant="secondary" size="lg" className="hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all">
                     En savoir plus
@@ -273,11 +300,18 @@ export default function Home() {
               </div>
             </div>
           </div>
+          
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-scroll-indicator">
+            <div className="w-6 h-10 rounded-full border-2 border-indigo-300/50 flex justify-center pt-2">
+              <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce-gentle" />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ===== STATS WITH ANIMATED COUNTERS ===== */}
-      <section id="stats-section" className="bg-white py-16 border-y border-slate-100 relative">
+      <section id="stats-section" className="bg-white py-16 border-y border-slate-100 relative reveal-on-scroll" style={{ opacity: revealedSections['stats-section'] ? 1 : 0, transform: revealedSections['stats-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, i) => (
@@ -300,7 +334,7 @@ export default function Home() {
       </section>
 
       {/* ===== SERVICES ===== */}
-      <section className="py-24 bg-slate-50/50 relative overflow-hidden">
+      <section id="services-section" className="py-24 bg-slate-50/50 relative overflow-hidden reveal-on-scroll" style={{ opacity: revealedSections['services-section'] ? 1 : 0, transform: revealedSections['services-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         <div className="absolute inset-0 neural-pattern" />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[120px]" style={{ pointerEvents: 'none' }} />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-cyan-100/30 rounded-full blur-[100px]" style={{ pointerEvents: 'none' }} />
@@ -320,10 +354,17 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {services.slice(0, 8).map((service, i) => (
               <Link key={service.id} to="/book" className="group no-underline">
-                <div className="bg-white border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/[0.06] hover:border-indigo-200/60 transition-all duration-300 h-full hover:-translate-y-1.5 relative overflow-hidden">
+                <div 
+                  className="bg-white border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/[0.06] hover:border-indigo-200/60 transition-all duration-300 h-full hover:-translate-y-1.5 relative overflow-hidden hover-3d"
+                  style={{ 
+                    opacity: revealedSections['services-section'] ? 1 : 0, 
+                    transform: revealedSections['services-section'] ? 'none' : 'translateY(20px)', 
+                    transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.1}s` 
+                  }}
+                >
                   <div className="absolute top-0 right-0 w-20 h-20 bg-slate-50 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-50 transition-colors" />
                   <div className="relative">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 text-white transition-all group-hover:scale-110 group-hover:shadow-lg ${serviceColors[i]}`}>
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 text-white transition-all group-hover:scale-110 group-hover:shadow-lg ${serviceColors[i]} animate-tilt`}>
                       <Brain className="w-5 h-5" />
                     </div>
                     <h3 className="text-base font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">
@@ -381,9 +422,9 @@ export default function Home() {
       </section>
 
       {/* ===== TESTIMONIALS CAROUSEL ===== */}
-      <section className="py-24 bg-slate-50/50 relative overflow-hidden">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-100/40 rounded-full blur-[100px]" style={{ pointerEvents: 'none' }} />
-        <div className="absolute bottom-20 right-10 w-64 h-64 bg-amber-100/40 rounded-full blur-[100px]" style={{ pointerEvents: 'none' }} />
+      <section id="testimonials-section" className="py-24 bg-slate-50/50 relative overflow-hidden reveal-on-scroll" style={{ opacity: revealedSections['testimonials-section'] ? 1 : 0, transform: revealedSections['testimonials-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+        <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-100/40 rounded-full blur-[100px] animate-pulse-glow" style={{ pointerEvents: 'none' }} />
+        <div className="absolute bottom-20 right-10 w-64 h-64 bg-amber-100/40 rounded-full blur-[100px] animate-morph" style={{ pointerEvents: 'none' }} />
 
         <div className="max-w-4xl mx-auto px-6 lg:px-8 relative">
           <div className="text-center mb-12">
@@ -450,7 +491,7 @@ export default function Home() {
       </section>
 
       {/* ===== INSURANCE PARTNERS WITH TRUST BADGES ===== */}
-      <section className="py-20 bg-white">
+      <section id="insurance-section" className="py-20 bg-white reveal-on-scroll" style={{ opacity: revealedSections['insurance-section'] ? 1 : 0, transform: revealedSections['insurance-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm text-sm font-semibold text-teal-600 mb-5">
@@ -510,11 +551,11 @@ export default function Home() {
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-24 relative overflow-hidden">
+      <section id="cta-section" className="py-24 relative overflow-hidden reveal-on-scroll" style={{ opacity: revealedSections['cta-section'] ? 1 : 0, transform: revealedSections['cta-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950" />
         <div className="absolute inset-0 dot-pattern opacity-[0.03]" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse-glow" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] animate-morph" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] rounded-3xl p-12 lg:p-16 relative overflow-hidden">
@@ -534,12 +575,14 @@ export default function Home() {
                 Planifiez votre consultation en ligne. Creneaux disponibles mis a jour en temps reel.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link to="/book" className="no-underline">
-                  <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50 hover:scale-105 transition-all shadow-xl shadow-black/20 border-0 font-bold">
-                    <Calendar className="w-5 h-5" />
-                    Prendre RDV
-                  </Button>
-                </Link>
+                <PulsingCTA delay={3000} interval={3000}>
+                  <Link to="/book" className="no-underline">
+                    <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50 hover:scale-105 transition-all shadow-xl shadow-black/20 border-0 font-bold">
+                      <Calendar className="w-5 h-5" />
+                      Prendre RDV
+                    </Button>
+                  </Link>
+                </PulsingCTA>
                 <Link to="/contact" className="no-underline">
                   <Button variant="ghost" size="lg" className="text-white/90 hover:text-white hover:bg-white/10 border border-white/15 hover:border-white/25 hover:scale-105 transition-all">
                     <Phone className="w-5 h-5" />

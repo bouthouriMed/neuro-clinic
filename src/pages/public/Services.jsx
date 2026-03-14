@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Brain, ArrowRight, Clock, Activity, Zap, BookOpen, Waves, Move, Sparkles } from 'lucide-react'
 import Button from '../../components/ui/Button'
+import PulsingCTA from '../../components/ui/PulsingCTA'
 import { services } from '../../data/mockData'
 
 const iconMap = { Brain, Zap, Activity, BookOpen, Waves, Move }
@@ -95,10 +96,12 @@ export default function Services() {
                 Réservez votre rendez-vous aujourd'hui et recevez des soins neurologiques experts du Dr. Bouthouri.
               </p>
               <Link to="/book" className="no-underline">
-                <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-50 shadow-xl shadow-black/20 border-0 text-[15px] px-8 py-4 hover:scale-105 transition-transform">
-                  Prendre RDV
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
+                <PulsingCTA delay={5000} interval={5000}>
+                  <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-50 shadow-xl shadow-black/20 border-0 text-[15px] px-8 py-4 hover:scale-105 transition-transform">
+                    Prendre RDV
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </PulsingCTA>
               </Link>
             </div>
           </div>
