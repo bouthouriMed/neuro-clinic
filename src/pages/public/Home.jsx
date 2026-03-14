@@ -17,12 +17,16 @@ import {
   Sparkles,
   Heart,
   Stethoscope,
+  Globe,
+  BadgeCheck,
+  Users,
 } from 'lucide-react'
 import Button from '../../components/ui/Button'
-import { services, testimonials, insurances } from '../../data/mockData'
+import { services, testimonials, insurances, doctor } from '../../data/mockData'
 
 export default function Home() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [statsAnimated, setStatsAnimated] = useState(false)
 
   // Auto-advance testimonials
   useEffect(() => {
@@ -30,6 +34,21 @@ export default function Home() {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
     }, 6000)
     return () => clearInterval(timer)
+  }, [])
+
+  // Animate stats on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const statsSection = document.getElementById('stats-section')
+      if (statsSection) {
+        const rect = statsSection.getBoundingClientRect()
+        if (rect.top < window.innerHeight * 0.8) {
+          setStatsAnimated(true)
+        }
+      }
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const nextTestimonial = () => {
@@ -40,17 +59,29 @@ export default function Home() {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)
   }
 
+  const trustBadges = [
+    { icon: BadgeCheck, text: "Membre de l'Académie Américaine de Neurologie", type: 'gold' },
+    { icon: Shield, text: 'Board Saoudien de Neurologie', type: 'indigo' },
+    { icon: Stethoscope, text: '15+ Années d\'expérience', type: 'teal' },
+  ]
+
+  const hospitalAffiliations = [
+    { name: 'Hôpital Militaire Tunis', years: 'Ancien' },
+    { name: 'Institut National de Neurologie', years: 'Ancien' },
+    { name: 'Hôpital Mouwasat Riyad', years: '6+ ans' },
+  ]
+
   const stats = [
-    { value: '15+', label: "Annees d'experience", icon: Award },
-    { value: '10K+', label: 'Patients traites', icon: Heart },
-    { value: '98%', label: 'Taux de satisfaction', icon: Star },
-    { value: '8', label: 'Specialisations', icon: Brain },
+    { value: '15+', label: "Années d'expérience", suffix: '' },
+    { value: '10K+', label: 'Patients traités', suffix: '' },
+    { value: '98%', label: 'Taux de satisfaction', suffix: '%' },
+    { value: '8', label: 'Spécialisations', suffix: '' },
   ]
 
   const trustSignals = [
-    { icon: Shield, title: 'Certifie', desc: "Membre de l'Academie Americaine de Neurologie. Board Saoudien de Neurologie.", gradient: 'from-indigo-500 to-indigo-600' },
+    { icon: Shield, title: 'Certifié', desc: "Membre de l'Académie Américaine de Neurologie. Board Saoudien de Neurologie.", gradient: 'from-indigo-500 to-indigo-600' },
     { icon: Calendar, title: 'RDV Facile', desc: 'Prenez rendez-vous en ligne en quelques clics, 24h/24.', gradient: 'from-cyan-500 to-teal-500' },
-    { icon: Award, title: 'Hopital Mouwasat', desc: "Plus de 6 ans d'experience a l'hopital Mouwasat de Riyad.", gradient: 'from-violet-500 to-purple-600' },
+    { icon: Award, title: 'Hôpital Mouwasat', desc: "Plus de 6 ans d'expérience à l'hôpital Mouwasat de Riyad.", gradient: 'from-violet-500 to-purple-600' },
   ]
 
   const serviceColors = [
@@ -81,24 +112,30 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                 </span>
-                Neurologue Experimente
+                Neurologue Expérimenté
               </div>
 
               <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.1] mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.75rem)' }}>
                 Le Dr. Abir Bouthouri
-                <span className="block text-gradient-animated mt-2">a votre service</span>
+                <span className="block text-gradient-animated mt-2">à votre service</span>
               </h1>
 
               <p className="text-lg text-slate-500 mb-6 max-w-lg leading-relaxed">
-                Plus de 15 ans d'experience en neurologie. Ancien de l'Institut National de Neurologie Mongi Ben Hamida et Hopital Mouwasat Riyad.
+                Plus de 15 ans d'expérience en neurologie. Ancien de l'Institut National de Neurologie Mongi Ben Hamida et Hôpital Mouwasat Riyad.
               </p>
 
-              {/* Specialty tags */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {['Epilepsie', 'Parkinson', 'AVC', 'Sclerose en Plaques', 'Migraines'].map((spec) => (
-                  <span key={spec} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-semibold hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all cursor-default">
-                    {spec}
-                  </span>
+              {/* Trust Badges */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                {trustBadges.map((badge, i) => (
+                  <div 
+                    key={i} 
+                    className={`trust-badge ${badge.type === 'gold' ? 'trust-badge-gold' : badge.type === 'teal' ? 'trust-badge-teal' : ''}`}
+                  >
+                    <div className={`trust-badge-icon ${badge.type === 'gold' ? 'gold' : badge.type === 'teal' ? 'teal' : ''}`}>
+                      <badge.icon className="w-3.5 h-3.5" />
+                    </div>
+                    {badge.text}
+                  </div>
                 ))}
               </div>
 
@@ -138,8 +175,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Doctor Card */}
-            <div className="hidden lg:block animate-fade-in-up-delay">
+            {/* Right: Doctor Card with Photo */}
+            <div className="lg:block animate-fade-in-up-delay">
               <div className="relative" style={{ padding: '20px' }}>
                 {/* Floating card: Appointment confirmed */}
                 <div className="absolute -top-4 -left-4 z-10 animate-float">
@@ -148,8 +185,8 @@ export default function Home() {
                       <CheckCircle className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-800">RDV Confirme</p>
-                      <p className="text-xs text-slate-400">Aujourd'hui a 09:30</p>
+                      <p className="text-sm font-semibold text-slate-800">RDV Confirmé</p>
+                      <p className="text-xs text-slate-400">Aujourd'hui à 09:30</p>
                     </div>
                   </div>
                 </div>
@@ -162,42 +199,54 @@ export default function Home() {
                         <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       ))}
                     </div>
-                    <p className="text-sm font-semibold text-slate-800">"Excellent medecin!"</p>
+                    <p className="text-sm font-semibold text-slate-800">"Excellent médecin!"</p>
                     <p className="text-xs text-slate-400 mt-0.5">— Mohamed B.</p>
                   </div>
                 </div>
 
-                {/* Main doctor card */}
-                <div className="relative bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-10 shadow-2xl shadow-indigo-900/20 overflow-hidden card-shine">
-                  {/* Decorative circles */}
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-                  <div className="absolute top-1/2 right-10 w-16 h-16 bg-cyan-400/10 rounded-full blur-xl" />
-
-                  <div className="relative">
-                    <div className="flex items-center gap-6 mb-8">
-                      <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:scale-110 transition-transform">
-                        <Brain className="w-10 h-10 text-white" />
+                {/* Main doctor card with gradient border */}
+                <div className="hero-frame">
+                  <div className="relative bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 rounded-3xl p-10 shadow-2xl shadow-indigo-900/20 overflow-hidden card-shine">
+                    {/* Doctor photo */}
+                    <div className="flex flex-col items-center justify-center mb-6">
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 shadow-lg mb-4">
+                        <img 
+                          src="/src/assets/dr.jpg" 
+                          alt="Dr. Abir Bouthouri" 
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white">Dr. Abir Bouthouri</h3>
-                        <p className="text-indigo-200 font-medium">Specialiste en Neurologie</p>
-                        <p className="text-indigo-300/70 text-xs mt-1 font-medium">Membre de l'Academie Americaine de Neurologie</p>
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-indigo-300" />
+                        <span className="text-sm text-indigo-200">Tunisie • Arabie Saoudite</span>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Experience', value: '15+ Ans' },
-                        { label: 'Patients', value: '10,000+' },
-                        { label: 'Hopitaux', value: '8+' },
-                        { label: 'Certification', value: 'Board SA' },
-                      ].map((item) => (
-                        <div key={item.label} className="bg-white/[0.08] backdrop-blur-sm rounded-xl p-4 hover:bg-white/[0.14] transition-all border border-white/[0.06]">
-                          <p className="text-[10px] text-indigo-300/70 uppercase tracking-widest font-semibold">{item.label}</p>
-                          <p className="text-lg font-bold text-white mt-1">{item.value}</p>
-                        </div>
-                      ))}
+                    {/* Decorative circles */}
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+                    <div className="absolute top-1/2 right-10 w-16 h-16 bg-cyan-400/10 rounded-full blur-xl" />
+
+                    <div className="relative">
+                      <div className="text-center mb-8">
+                        <h3 className="text-2xl font-bold text-white">Dr. Abir Bouthouri</h3>
+                        <p className="text-indigo-200 font-medium">Spécialiste en Neurologie</p>
+                        <p className="text-indigo-300/70 text-xs mt-1 font-medium">Membre de l'Académie Américaine de Neurologie</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { label: 'Expérience', value: '15+ Ans' },
+                          { label: 'Patients', value: '10,000+' },
+                          { label: 'Hôpitaux', value: '8+' },
+                          { label: 'Certification', value: 'Board SA' },
+                        ].map((item) => (
+                          <div key={item.label} className="bg-white/[0.08] backdrop-blur-sm rounded-xl p-4 hover:bg-white/[0.14] transition-all border border-white/[0.06]">
+                            <p className="text-[10px] text-indigo-300/70 uppercase tracking-widest font-semibold">{item.label}</p>
+                            <p className="text-lg font-bold text-white mt-1">{item.value}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -207,16 +256,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== STATS ===== */}
-      <section className="bg-white py-16 border-y border-slate-100 relative">
+      {/* ===== STATS WITH ANIMATED COUNTERS ===== */}
+      <section id="stats-section" className="bg-white py-16 border-y border-slate-100 relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, i) => (
               <div key={stat.label} className="text-center group cursor-default hover-lift">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 mb-4 group-hover:bg-indigo-100 transition-colors">
-                  <stat.icon className="w-5 h-5 text-indigo-500" />
+                  {i === 0 && <Award className="w-5 h-5 text-indigo-500" />}
+                  {i === 1 && <Users className="w-5 h-5 text-indigo-500" />}
+                  {i === 2 && <Heart className="w-5 h-5 text-indigo-500" />}
+                  {i === 3 && <Brain className="w-5 h-5 text-indigo-500" />}
                 </div>
-                <p className="text-3xl md:text-4xl font-bold text-slate-900">{stat.value}</p>
+                <div className={`stat-counter ${statsAnimated ? 'animate-fade-in-up' : ''}`} style={{ animationDelay: `${i * 100}ms` }}>
+                  <span className="stat-number">{stat.value}</span>
+                  {stat.suffix && <span className="stat-suffix">{stat.suffix}</span>}
+                </div>
                 <p className="text-sm text-slate-400 mt-1 font-medium">{stat.label}</p>
               </div>
             ))}
@@ -374,16 +429,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== INSURANCE PARTNERS ===== */}
+      {/* ===== INSURANCE PARTNERS WITH TRUST BADGES ===== */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm text-sm font-semibold text-teal-600 mb-5">
               <Building className="w-4 h-4" />
               Partenaires Assurance
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Nous acceptons les principales assurances tunisiennes</h2>
-            <p className="text-slate-500 mt-2">Consultez-nous pour les details de votre couverture</p>
+            <p className="text-slate-500 mt-2"> Consultez-nous pour les détails de votre couverture</p>
+          </div>
+
+          {/* Insurance Trust Badges */}
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <div className="trust-badge-teal">
+              <div className="trust-badge-icon teal">
+                <Shield className="w-3.5 h-3.5" />
+              </div>
+              Acceptation CNAM
+            </div>
+            <div className="trust-badge-teal">
+              <div className="trust-badge-icon teal">
+                <Shield className="w-3.5 h-3.5" />
+              </div>
+              Acceptation CNRPS
+            </div>
+            <div className="trust-badge">
+              <div className="trust-badge-icon">
+                <CheckCircle className="w-3.5 h-3.5" />
+              </div>
+              Remboursement rapide
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
@@ -395,7 +472,7 @@ export default function Home() {
               { name: 'BIAT', logo: '/src/assets/biat_logo.png' },
               { name: 'STAR', logo: '/src/assets/star_logo.png' },
             ].map((insurance) => (
-              <div key={insurance.name} className="group bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default">
+              <div key={insurance.name} className="group bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default premium-card">
                 <div className="text-center">
                   <div className="h-12 flex items-center justify-center mb-2">
                     <img 
