@@ -260,6 +260,7 @@ export default function Home() {
                         <img 
                           src="/dr.jpg" 
                           alt="Dr. Abir Bouthouri" 
+                          fetchPriority="high"
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -539,6 +540,7 @@ export default function Home() {
                     <img 
                       src={insurance.logo} 
                       alt={insurance.name}
+                      loading="lazy"
                       className="max-h-10 max-w-full object-contain grayscale group-hover:grayscale-0 transition-all"
                     />
                   </div>

@@ -4,4 +4,18 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-lucide': ['lucide-react'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 500,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+  },
 })

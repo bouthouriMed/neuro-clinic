@@ -1,23 +1,33 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import PublicLayout from './components/layout/PublicLayout'
 import DashboardLayout from './components/layout/DashboardLayout'
 
-import Home from './pages/public/Home'
-import About from './pages/public/About'
-import Services from './pages/public/Services'
-import BookAppointment from './pages/public/BookAppointment'
-import Contact from './pages/public/Contact'
+const Home = lazy(() => import('./pages/public/Home'))
+const About = lazy(() => import('./pages/public/About'))
+const Services = lazy(() => import('./pages/public/Services'))
+const BookAppointment = lazy(() => import('./pages/public/BookAppointment'))
+const Contact = lazy(() => import('./pages/public/Contact'))
 
-import Overview from './pages/dashboard/Overview'
-import Appointments from './pages/dashboard/Appointments'
-import Patients from './pages/dashboard/Patients'
-import CalendarView from './pages/dashboard/CalendarView'
-import Notifications from './pages/dashboard/Notifications'
+const Overview = lazy(() => import('./pages/dashboard/Overview'))
+const Appointments = lazy(() => import('./pages/dashboard/Appointments'))
+const Patients = lazy(() => import('./pages/dashboard/Patients'))
+const CalendarView = lazy(() => import('./pages/dashboard/CalendarView'))
+const Notifications = lazy(() => import('./pages/dashboard/Notifications'))
+
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         {/* Public Website */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
@@ -35,7 +45,8 @@ export default function App() {
           <Route path="calendar" element={<CalendarView />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
