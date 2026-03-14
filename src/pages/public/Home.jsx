@@ -231,7 +231,7 @@ export default function Home() {
                     <div className="flex flex-col items-center justify-center mb-6">
                       <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 shadow-lg mb-4">
                         <img 
-                          src="/src/assets/dr.jpg" 
+                          src="/dr.jpg" 
                           alt="Dr. Abir Bouthouri" 
                           className="w-full h-full object-cover"
                         />
@@ -485,12 +485,12 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {[
-              { name: 'CNAM', logo: '/src/assets/cnam_logo.png' },
-              { name: 'CNRPS', logo: '/src/assets/CNRPS_logo.png' },
-              { name: 'MAE', logo: '/src/assets/mae_logo.png' },
-              { name: 'Generali', logo: '/src/assets/la_mutuelle_generale_blocmarque_rgb_logo.png' },
-              { name: 'BIAT', logo: '/src/assets/biat_logo.png' },
-              { name: 'STAR', logo: '/src/assets/star_logo.png' },
+              { name: 'CNAM', logo: '/cnam_logo.png' },
+              { name: 'CNRPS', logo: '/CNRPS_logo.png' },
+              { name: 'MAE', logo: '/mae_logo.png' },
+              { name: 'Generali', logo: '/la_mutuelle_generale_blocmarque_rgb_logo.png' },
+              { name: 'BIAT', logo: '/biat_logo.png' },
+              { name: 'STAR', logo: '/star_logo.png' },
             ].map((insurance) => (
               <div key={insurance.name} className="group bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default premium-card">
                 <div className="text-center">
