@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function PulsingCTA({ children, delay = 5000, interval = 5000 }) {
+export default function PulsingCTA({ children, delay = 0, interval = 0 }) {
   const [isVibrating, setIsVibrating] = useState(false)
 
   useEffect(() => {
@@ -10,7 +10,7 @@ export default function PulsingCTA({ children, delay = 5000, interval = 5000 }) 
 
     const vibrateInterval = setInterval(() => {
       setIsVibrating(true)
-      setTimeout(() => setIsVibrating(false), 500)
+      setTimeout(() => setIsVibrating(false), 0)
     }, delay + interval)
 
     return () => {
@@ -21,7 +21,7 @@ export default function PulsingCTA({ children, delay = 5000, interval = 5000 }) 
 
   return (
     <span className={`inline-flex rounded-xl ${isVibrating ? 'animate-vibrate' : ''}`}>
-      <span className={isVibrating ? 'animate-glow-pulse' : 'glow-cta'}>
+      <span className={`rounded-xl ${isVibrating ? 'animate-glow-pulse' : 'glow-cta'}`}>
         {children}
       </span>
     </span>

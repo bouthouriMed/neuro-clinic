@@ -51,7 +51,7 @@ export default function Services() {
               return (
                 <div
                   key={service.id}
-                  className="bg-white border border-slate-200 rounded-2xl group p-9 hover:shadow-xl hover:shadow-slate-200/60 hover:-translate-y-1 hover:border-indigo-200 transition-all duration-300"
+                  className="bg-white border border-slate-200 rounded-2xl group p-9 hover:shadow-xl hover:shadow-slate-200/60 hover:-translate-y-1 hover:border-indigo-200 transition-all duration-300 card-3d"
                 >
                   <div className="flex items-start justify-between mb-6">
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradients[i]} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>

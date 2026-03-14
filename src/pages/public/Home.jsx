@@ -115,7 +115,7 @@ export default function Home() {
   ]
 
   return (
-    <div style={{ overflowX: 'hidden' }}>
+    <div>
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center overflow-hidden" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
         {/* Background layers */}
@@ -355,7 +355,7 @@ export default function Home() {
             {services.slice(0, 8).map((service, i) => (
               <Link key={service.id} to="/book" className="group no-underline">
                 <div 
-                  className="bg-white border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/[0.06] hover:border-indigo-200/60 transition-all duration-300 h-full hover:-translate-y-1.5 relative overflow-hidden hover-3d"
+                  className="bg-white border border-slate-200/80 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/[0.06] hover:border-indigo-200/60 transition-all duration-300 h-full hover:-translate-y-1.5 relative overflow-hidden hover-3d card-3d"
                   style={{ 
                     opacity: revealedSections['services-section'] ? 1 : 0, 
                     transform: revealedSections['services-section'] ? 'none' : 'translateY(20px)', 

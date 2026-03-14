@@ -29,7 +29,7 @@ export default function Button({
 }) {
   return (
     <button
-      className={`inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${variants[variant] || variants.secondary} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ripple-btn ${variants[variant] || variants.secondary} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}
