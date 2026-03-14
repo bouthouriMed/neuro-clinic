@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Brain,
   LayoutDashboard,
@@ -21,10 +21,16 @@ const navItems = [
 
 export default function DashboardSidebar({ collapsed, onToggle }) {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const unreadCount = notifications.filter((n) => !n.read).length
 
   const isActive = (item) =>
     item.exact ? pathname === item.to : pathname.startsWith(item.to)
+
+  const handleLogout = () => {
+    localStorage.removeItem('neuroclinic_auth')
+    navigate('/login')
+  }
 
   return (
     <aside
@@ -74,14 +80,14 @@ export default function DashboardSidebar({ collapsed, onToggle }) {
       </nav>
 
       <div className="p-3 border-t border-slate-800 space-y-1">
-        <Link
-          to="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors no-underline"
-          title={collapsed ? 'Retour au site' : undefined}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors w-full cursor-pointer"
+          title={collapsed ? 'Déconnexion' : undefined}
         >
           <LogOut className="w-5 h-5 shrink-0" />
-          {!collapsed && <span>Retour au site</span>}
-        </Link>
+          {!collapsed && <span>Déconnexion</span>}
+        </button>
         <button
           onClick={onToggle}
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors w-full cursor-pointer"

@@ -2,12 +2,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import PublicLayout from './components/layout/PublicLayout'
 import DashboardLayout from './components/layout/DashboardLayout'
+import ProtectedRoute from './components/ProtectedRoute'
 
 const Home = lazy(() => import('./pages/public/Home'))
 const About = lazy(() => import('./pages/public/About'))
 const Services = lazy(() => import('./pages/public/Services'))
 const BookAppointment = lazy(() => import('./pages/public/BookAppointment'))
 const Contact = lazy(() => import('./pages/public/Contact'))
+const Login = lazy(() => import('./pages/public/Login'))
 
 const Overview = lazy(() => import('./pages/dashboard/Overview'))
 const Appointments = lazy(() => import('./pages/dashboard/Appointments'))
@@ -37,8 +39,15 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
         </Route>
 
-        {/* Doctor Dashboard */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Doctor Dashboard (Protected) */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
           <Route index element={<Overview />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="patients" element={<Patients />} />
