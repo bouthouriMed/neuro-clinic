@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -17,18 +17,64 @@ import {
   Sparkles,
   Heart,
   Users,
+  Zap,
+  BookOpen,
+  Move,
+  Waves,
+  Wind,
+  Smile,
 } from 'lucide-react'
 import Button from '../../components/ui/Button'
 import PulsingCTA from '../../components/ui/PulsingCTA'
 import HeroVideo from '../../components/ui/HeroVideo'
 import SitePreloader from '../../components/ui/SitePreloader'
 import { services, testimonials } from '../../data/mockData'
+import { HeroVideoContext } from '../../contexts/HeroVideoContext'
+
+// Map icon names to lucide-react components
+const iconMap = {
+  Brain,
+  Zap,
+  Activity,
+  BookOpen,
+  Move,
+  Waves,
+  Heart,
+  Shield,
+  Wind,
+  Smile,
+}
 
 export default function Home() {
-  const [siteReady, setSiteReady] = useState(false)
+  const { heroVideoLoaded, markVideoLoaded } = useContext(HeroVideoContext)
+
+  // Check localStorage directly for immediate value
+  const [shouldShowPreloader, setShouldPreloader] = useState(() => {
+    try {
+      return localStorage.getItem('heroVideoLoaded') !== 'true'
+    } catch {
+      return true
+    }
+  })
+
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [statsAnimated, setStatsAnimated] = useState(false)
   const [revealedSections, setRevealedSections] = useState({})
+
+  // Update preloader state when context changes
+  useEffect(() => {
+    if (heroVideoLoaded) {
+      setShouldPreloader(false)
+    }
+  }, [heroVideoLoaded])
+
+  // Fallback: hide preloader after 5 seconds (in case video fails to load)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldPreloader(false)
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Auto-advance testimonials
   useEffect(() => {
@@ -104,12 +150,11 @@ export default function Home() {
 
   return (
     <div>
-      {/* ===== HERO VIDEO ===== */}
       {/* ===== SITE PRELOADER ===== */}
-      <SitePreloader isLoading={!siteReady} />
+      {shouldShowPreloader && <SitePreloader isLoading={shouldShowPreloader} />}
 
       {/* ===== HERO VIDEO ===== */}
-      <HeroVideo onVideoReady={() => setSiteReady(true)} />
+      <HeroVideo onVideoReady={() => markVideoLoaded()} />
 
       {/* ===== STATS WITH ANIMATED COUNTERS ===== */}
       <section id="stats-section" className="bg-white py-16 border-y border-slate-100 relative reveal-on-scroll" style={{ opacity: revealedSections['stats-section'] ? 1 : 0, transform: revealedSections['stats-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
@@ -166,7 +211,10 @@ export default function Home() {
                   <div className="absolute top-0 right-0 w-20 h-20 bg-slate-50 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-50 transition-colors" />
                   <div className="relative">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 text-white transition-all group-hover:scale-110 group-hover:shadow-lg ${serviceColors[i]} animate-tilt`}>
-                      <Brain className="w-5 h-5" />
+                      {(() => {
+                        const IconComponent = iconMap[service.icon] || Brain
+                        return <IconComponent className="w-5 h-5" />
+                      })()}
                     </div>
                     <h3 className="text-base font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">
                       {service.title}

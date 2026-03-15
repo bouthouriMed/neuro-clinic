@@ -1,10 +1,21 @@
 import { Link } from 'react-router-dom'
-import { Brain, ArrowRight, Clock, Activity, Zap, BookOpen, Waves, Move, Sparkles } from 'lucide-react'
+import { Brain, ArrowRight, Clock, Activity, Zap, BookOpen, Waves, Move, Sparkles, Shield, Wind, Smile, Heart } from 'lucide-react'
 import Button from '../../components/ui/Button'
 import PulsingCTA from '../../components/ui/PulsingCTA'
 import { services } from '../../data/mockData'
 
-const iconMap = { Brain, Zap, Activity, BookOpen, Waves, Move }
+const iconMap = {
+  Brain,
+  Zap,
+  Activity,
+  BookOpen,
+  Waves,
+  Move,
+  Shield,
+  Heart,
+  Wind,
+  Smile,
+}
 
 const gradients = [
   'from-indigo-500 to-indigo-600',

@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Phone, Calendar, Play } from 'lucide-react'
 import Button from './Button'
 import PulsingCTA from './PulsingCTA'
+import { HeroVideoContext } from '../../contexts/HeroVideoContext'
 
 // Lightweight shimmer loader shown before video is ready
 function HeroLoader({ isVisible }) {
@@ -33,7 +34,7 @@ function HeroLoader({ isVisible }) {
 }
 
 export default function HeroVideo({ onVideoReady }) {
-  const [videoLoaded, setVideoLoaded] = useState(false)
+  const { heroVideoLoaded, markVideoLoaded } = useContext(HeroVideoContext)
   const [videoError, setVideoError] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
@@ -44,6 +45,7 @@ export default function HeroVideo({ onVideoReady }) {
 
   const videoRef = useRef(null)
   const heroRef = useRef(null)
+  const retryCountRef = useRef(0)
 
   // Subscribe to resize and reduced motion changes
   useEffect(() => {
@@ -86,25 +88,36 @@ export default function HeroVideo({ onVideoReady }) {
   }, [])
 
   const handleVideoReady = useCallback(() => {
-    setVideoLoaded(true)
+    markVideoLoaded()
+    retryCountRef.current = 0
     onVideoReady?.()
-  }, [onVideoReady])
+  }, [markVideoLoaded, onVideoReady])
 
   const handleVideoError = useCallback(() => {
-    setVideoError(true)
-    setVideoLoaded(true) // hide loader
-    onVideoReady?.()
+    // Retry up to 2 times before showing fallback
+    if (retryCountRef.current < 2) {
+      retryCountRef.current += 1
+      // Retry by resetting and reloading the video
+      if (videoRef.current) {
+        videoRef.current.load()
+      }
+    } else {
+      // After 2 retries, accept the error
+      setVideoError(true)
+      onVideoReady?.()
+    }
   }, [onVideoReady])
 
   const shouldShowVideo = !prefersReducedMotion && !videoError
 
   // Signal ready immediately when video won't be shown
   useEffect(() => {
-    if (!shouldShowVideo) {
+    if (!shouldShowVideo && !heroVideoLoaded) {
+      markVideoLoaded()
       onVideoReady?.()
     }
-  }, [shouldShowVideo, onVideoReady])
-  const showLoader = !videoLoaded && shouldShowVideo
+  }, [shouldShowVideo, heroVideoLoaded, markVideoLoaded, onVideoReady])
+  const showLoader = !heroVideoLoaded && shouldShowVideo
   const parallaxOffset = (prefersReducedMotion || isMobile) ? 0 : scrollY * 0.3
 
   return (
@@ -125,20 +138,21 @@ export default function HeroVideo({ onVideoReady }) {
           <video
             ref={videoRef}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-              videoLoaded ? 'opacity-100' : 'opacity-0'
+              heroVideoLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             autoPlay
             muted
             loop
             playsInline
-            preload="auto"
-            poster="/hero.png"
+            preload="metadata"
+            crossOrigin="anonymous"
             onCanPlayThrough={handleVideoReady}
             onLoadedData={handleVideoReady}
             onError={handleVideoError}
             aria-hidden="true"
-            src="/landing_video.mp4"
-          />
+          >
+            <source src="/landing_video.mp4" type="video/mp4" />
+          </video>
         </div>
       ) : (
         /* Fallback static image for mobile / reduced-motion / error */
@@ -196,7 +210,7 @@ export default function HeroVideo({ onVideoReady }) {
             >
               Dr. Abir Bouthouri
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-indigo-300 to-violet-300 mt-2">
-                Neurologue Spécialiste
+                Neurologue
               </span>
             </h1>
           </div>
