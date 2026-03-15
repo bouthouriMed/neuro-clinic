@@ -1,6 +1,6 @@
 const variants = {
   primary:
-    'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/20 hover:shadow-lg hover:shadow-indigo-600/30 active:scale-[0.98]',
+    'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 shadow-lg shadow-indigo-600/25 hover:shadow-lg hover:shadow-indigo-600/40 active:scale-[0.98]',
   secondary:
     'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-sm active:scale-[0.98]',
   ghost:

@@ -184,7 +184,7 @@ export default function HeroVideo({ onVideoReady }) {
           willChange: (prefersReducedMotion || isMobile) ? 'auto' : 'transform',
         }}
       >
-        <div className="max-w-2xl md:text-left text-center mx-auto md:mx-0">
+        <div className="max-w-2xl mx-auto text-center">
           {/* Badge */}
           <div
             className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
@@ -199,20 +199,42 @@ export default function HeroVideo({ onVideoReady }) {
             </div>
           </div>
 
-          {/* Heading */}
+          {/* Heading - Premium Crystal Style */}
           <div
             className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
             style={{ transitionDelay: '0.25s' }}
           >
-            <h1
-              className="text-white font-bold leading-[1.1] mb-6"
-              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}
-            >
-              Dr. Abir Bouthouri
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-indigo-300 to-violet-300 mt-2">
-                Neurologue
-              </span>
-            </h1>
+            {/* Doctor Name - Crystal Premium */}
+            <div className="relative mb-8">
+              {/* Outer glow effect */}
+              <div className="absolute -inset-6 bg-gradient-to-r from-cyan-500/20 via-white/10 to-violet-500/20 rounded-2xl blur-2xl" />
+              
+              {/* Inner subtle glow */}
+              <div className="absolute -inset-3 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-xl" />
+              
+              <h1
+                className="relative text-white font-bold leading-[1.1]"
+                style={{ 
+                  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                  textShadow: '0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1)',
+                }}
+              >
+                {/* Main name with subtle inner shine */}
+                <span className="block relative">
+                  <span className="relative bg-gradient-to-b from-white via-white to-white/80 bg-clip-text text-transparent">
+                    Dr. Abir Bouthouri
+                  </span>
+                </span>
+                
+                {/* Title with elegant gradient */}
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-indigo-200 to-violet-200 mt-4 text-2xl md:text-3xl font-semibold">
+                  Neurologue
+                </span>
+              </h1>
+              
+              {/* Elegant accent line */}
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-px bg-gradient-to-r from-transparent via-amber-300/80 to-transparent" />
+            </div>
           </div>
 
           {/* Tagline */}
@@ -220,7 +242,7 @@ export default function HeroVideo({ onVideoReady }) {
             className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
             style={{ transitionDelay: '0.4s' }}
           >
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed">
+            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg mx-auto leading-relaxed">
               Plus de 15 ans d'expérience en neurologie. Membre de l'Académie
               Américaine de Neurologie. Des soins modernes et personnalisés.
             </p>
@@ -231,7 +253,7 @@ export default function HeroVideo({ onVideoReady }) {
             className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
             style={{ transitionDelay: '0.55s' }}
           >
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+            <div className="flex flex-wrap gap-4 justify-center">
               <PulsingCTA delay={5000} interval={5000}>
                 <Link to="/book" className="no-underline">
                   <Button

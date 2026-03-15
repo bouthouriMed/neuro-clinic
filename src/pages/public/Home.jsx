@@ -157,16 +157,18 @@ export default function Home() {
       <HeroVideo onVideoReady={() => markVideoLoaded()} />
 
       {/* ===== STATS WITH ANIMATED COUNTERS ===== */}
-      <section id="stats-section" className="bg-white py-16 border-y border-slate-100 relative reveal-on-scroll" style={{ opacity: revealedSections['stats-section'] ? 1 : 0, transform: revealedSections['stats-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section id="stats-section" className="py-16 bg-gradient-to-r from-indigo-50 via-white to-violet-50 border-y border-indigo-100/50 relative reveal-on-scroll" style={{ opacity: revealedSections['stats-section'] ? 1 : 0, transform: revealedSections['stats-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-100/50 rounded-full blur-[80px]" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-violet-100/50 rounded-full blur-[80px]" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, i) => (
               <div key={stat.label} className="text-center group cursor-default hover-lift">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-50 mb-4 group-hover:bg-indigo-100 transition-colors">
-                  {i === 0 && <Award className="w-5 h-5 text-indigo-500" />}
-                  {i === 1 && <Users className="w-5 h-5 text-indigo-500" />}
-                  {i === 2 && <Heart className="w-5 h-5 text-indigo-500" />}
-                  {i === 3 && <Brain className="w-5 h-5 text-indigo-500" />}
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 mb-4 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-indigo-500/25">
+                  {i === 0 && <Award className="w-6 h-6 text-white" />}
+                  {i === 1 && <Users className="w-6 h-6 text-white" />}
+                  {i === 2 && <Heart className="w-6 h-6 text-white" />}
+                  {i === 3 && <Brain className="w-6 h-6 text-white" />}
                 </div>
                 <div className={`stat-counter ${statsAnimated ? 'animate-fade-in-up' : ''}`} style={{ animationDelay: `${i * 100}ms` }}>
                   <span className="stat-number">{stat.value}</span>
@@ -242,12 +244,14 @@ export default function Home() {
       </section>
 
       {/* ===== WHY CHOOSE US ===== */}
-      <section className="py-24 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 dot-pattern opacity-30" />
+      <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-100/40 rounded-full blur-[80px]" />
+        <div className="absolute inset-0 dot-pattern opacity-20" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm text-sm font-semibold text-indigo-600 mb-5">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-indigo-200/60 shadow-lg shadow-indigo-500/10 text-sm font-semibold text-indigo-600 mb-5">
               <Sparkles className="w-4 h-4" />
               Pourquoi Nous
             </div>
@@ -271,13 +275,13 @@ export default function Home() {
       </section>
 
       {/* ===== TESTIMONIALS CAROUSEL ===== */}
-      <section id="testimonials-section" className="py-24 bg-slate-50/50 relative overflow-hidden reveal-on-scroll" style={{ opacity: revealedSections['testimonials-section'] ? 1 : 0, transform: revealedSections['testimonials-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-        <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-100/40 rounded-full blur-[100px] animate-pulse-glow" style={{ pointerEvents: 'none' }} />
-        <div className="absolute bottom-20 right-10 w-64 h-64 bg-amber-100/40 rounded-full blur-[100px] animate-morph" style={{ pointerEvents: 'none' }} />
+      <section id="testimonials-section" className="py-24 bg-gradient-to-br from-amber-50 via-white to-indigo-50 relative overflow-hidden reveal-on-scroll" style={{ opacity: revealedSections['testimonials-section'] ? 1 : 0, transform: revealedSections['testimonials-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+        <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-200/40 rounded-full blur-[100px] animate-pulse-glow" style={{ pointerEvents: 'none' }} />
+        <div className="absolute bottom-20 right-10 w-64 h-64 bg-amber-200/40 rounded-full blur-[100px] animate-morph" style={{ pointerEvents: 'none' }} />
 
         <div className="max-w-4xl mx-auto px-6 lg:px-8 relative">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm text-sm font-semibold text-amber-600 mb-5">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-amber-200/60 shadow-lg shadow-amber-500/10 text-sm font-semibold text-amber-600 mb-5">
               <Star className="w-4 h-4 fill-amber-500" />
               Temoignages Patients
             </div>
@@ -340,10 +344,12 @@ export default function Home() {
       </section>
 
       {/* ===== INSURANCE PARTNERS WITH TRUST BADGES ===== */}
-      <section id="insurance-section" className="py-20 bg-white reveal-on-scroll" style={{ opacity: revealedSections['insurance-section'] ? 1 : 0, transform: revealedSections['insurance-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section id="insurance-section" className="py-20 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative reveal-on-scroll" style={{ opacity: revealedSections['insurance-section'] ? 1 : 0, transform: revealedSections['insurance-section'] ? 'none' : 'translateY(30px)', transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-100/40 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-100/40 rounded-full blur-[80px]" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/80 shadow-sm text-sm font-semibold text-teal-600 mb-5">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-teal-200/60 shadow-lg shadow-teal-500/10 text-sm font-semibold text-teal-600 mb-5">
               <Building className="w-4 h-4" />
               Partenaires Assurance
             </div>
@@ -353,27 +359,27 @@ export default function Home() {
 
           {/* Insurance Trust Badges */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
-            <div className="trust-badge-teal">
-              <div className="trust-badge-icon teal">
+            <div className="trust-badge-teal px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl shadow-lg shadow-emerald-500/25 hover:scale-105 transition-transform cursor-pointer">
+              <div className="trust-badge-icon teal bg-white/20 mr-2">
                 <Shield className="w-3.5 h-3.5" />
               </div>
               Acceptation CNAM
             </div>
-            <div className="trust-badge-teal">
-              <div className="trust-badge-icon teal">
+            <div className="trust-badge-teal px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl shadow-lg shadow-emerald-500/25 hover:scale-105 transition-transform cursor-pointer">
+              <div className="trust-badge-icon teal bg-white/20 mr-2">
                 <Shield className="w-3.5 h-3.5" />
               </div>
               Acceptation CNRPS
             </div>
-            <div className="trust-badge">
-              <div className="trust-badge-icon">
+            <div className="trust-badge px-5 py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-xl shadow-lg shadow-indigo-500/25 hover:scale-105 transition-transform cursor-pointer">
+              <div className="trust-badge-icon bg-white/20 mr-2">
                 <CheckCircle className="w-3.5 h-3.5" />
               </div>
               Remboursement rapide
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
               { name: 'CNAM', logo: '/cnam_logo.png' },
               { name: 'CNRPS', logo: '/CNRPS_logo.png' },
@@ -382,7 +388,7 @@ export default function Home() {
               { name: 'BIAT', logo: '/biat_logo.png' },
               { name: 'STAR', logo: '/star_logo.png' },
             ].map((insurance) => (
-              <div key={insurance.name} className="insurance-grid-item group bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:bg-white hover:shadow-lg hover:shadow-slate-200/50 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default premium-card">
+              <div key={insurance.name} className="insurance-grid-item group bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/50 hover:bg-white hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-200/60 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center cursor-default">
                 <div className="text-center">
                   <div className="h-12 flex items-center justify-center mb-2">
                     <img 

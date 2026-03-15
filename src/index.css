@@ -69,6 +69,12 @@ body {
   100% { background-position: 0% 50%; }
 }
 
+@keyframes animate-gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 @keyframes morph {
   0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
   25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
@@ -269,6 +275,11 @@ body {
   background: linear-gradient(90deg, #4f46e5, #06b6d4, #7c3aed, #4f46e5);
   background-size: 300% 100%;
   animation: gradient-border 3s linear infinite;
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: animate-gradient-x 3s ease infinite;
 }
 
 .animate-float-diamond {
@@ -697,6 +708,13 @@ input, textarea, select {
 
 /* ========== UTILITY CLASSES ========== */
 
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -707,6 +725,13 @@ input, textarea, select {
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

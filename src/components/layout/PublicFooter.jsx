@@ -69,7 +69,7 @@ export default function PublicFooter() {
               </div>
               <div className="flex gap-3">
                 <Phone className="w-4 h-4 text-indigo-400" />
-                <span className="text-sm">{doctor.contact.phone}</span>
+                <span className="text-sm">{doctor.contact.whatsapp}</span>
               </div>
               <div className="flex gap-3">
                 <Mail className="w-4 h-4 text-indigo-400" />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   Calendar,
   Clock,
@@ -8,14 +8,16 @@ import {
   CheckCircle,
   ArrowLeft,
   ArrowRight,
-  Sparkles,
   CalendarDays,
   Shield,
+  CalendarCheck,
+  MapPin,
+  Bell,
 } from 'lucide-react'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { Textarea } from '../../components/ui/Input'
-import { timeSlots } from '../../data/mockData'
+import { timeSlots, doctor } from '../../data/mockData'
 
 const steps = ['Date & Heure', 'Vos Informations', 'Confirmé']
 
@@ -29,13 +31,42 @@ export default function BookAppointment() {
     email: '',
     reason: '',
   })
+  const [success, setSuccess] = useState(null)
 
-  const update = (field, value) => setForm((f) => ({ ...f, [field]: value }))
+  const timeSectionRef = useRef(null)
+  const continueButtonRef = useRef(null)
+  const step2Ref = useRef(null)
+  const step3Ref = useRef(null)
+
+  const update = (field, value) => {
+    setForm((f) => ({ ...f, [field]: value }))
+    
+    if (field === 'date' && value) {
+      setTimeout(() => {
+        const element = timeSectionRef.current
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          const offset = rect.top - 150
+          window.scrollTo({ top: window.scrollY + offset, behavior: 'smooth' })
+        }
+      }, 200)
+    }
+    if (field === 'time' && value) {
+      setTimeout(() => {
+        const element = continueButtonRef.current
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          const offset = rect.top - 200
+          window.scrollTo({ top: window.scrollY + offset, behavior: 'smooth' })
+        }
+      }, 200)
+    }
+  }
 
   const generateDates = () => {
     const dates = []
     const today = new Date()
-    for (let i = 1; i <= 14; i++) {
+    for (let i = 1; i <= 21; i++) {
       const d = new Date(today)
       d.setDate(today.getDate() + i)
       if (d.getDay() !== 0) {
@@ -44,6 +75,7 @@ export default function BookAppointment() {
           day: d.toLocaleDateString('fr', { weekday: 'short' }),
           date: d.getDate(),
           month: d.toLocaleDateString('fr', { month: 'short' }),
+          fullDate: d
         })
       }
     }
@@ -52,59 +84,95 @@ export default function BookAppointment() {
 
   const dates = generateDates()
 
+  const handleOAuth = (provider) => {
+    console.log(`${provider} login clicked - OAuth coming soon`)
+  }
+
+  const handleContinue = () => {
+    setStep(1)
+    setTimeout(() => {
+      const element = step2Ref.current
+      if (element) {
+        const offset = element.getBoundingClientRect().top - 180
+        window.scrollTo({ top: window.scrollY + offset, behavior: 'smooth' })
+      }
+    }, 200)
+  }
+
+  const handleSubmit = () => {
+    setSuccess({
+      id: Date.now(),
+      date: form.date,
+      time: form.time,
+      service: 'Consultation Neurologique',
+      patientName: form.name
+    })
+    setStep(2)
+    setTimeout(() => {
+      const element = step3Ref.current
+      if (element) {
+        const offset = element.getBoundingClientRect().top - 180
+        window.scrollTo({ top: window.scrollY + offset, behavior: 'smooth' })
+      }
+    }, 200)
+  }
+
+  const handleReset = () => {
+    setStep(0)
+    setForm({ date: '', time: '', name: '', phone: '', email: '', reason: '' })
+    setSuccess(null)
+  }
+
   return (
     <>
       {/* Header */}
-      <section className="relative overflow-hidden" style={{ paddingTop: '20px' }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30" />
-        <div className="absolute inset-0 grid-pattern opacity-50" />
+      <section className="relative overflow-hidden min-h-[40vh] flex items-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950" />
+        <div className="absolute inset-0 dot-pattern opacity-[0.03]" />
+        <div className="absolute top-0 right-0 md:w-[700px] w-[300px] md:h-[700px] h-[300px] bg-indigo-500/15 rounded-full blur-[150px] animate-pulse" />
+        <div className="absolute bottom-0 left-0 md:w-[600px] w-[250px] md:h-[600px] h-[250px] bg-cyan-500/10 rounded-full blur-[120px] animate-morph" />
 
-        <div className="relative max-w-3xl mx-auto px-6 py-16 md:py-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm text-xs font-semibold text-indigo-600 mb-5">
-            <CalendarDays className="w-3.5 h-3.5" />
+        <div className="relative max-w-4xl mx-auto px-6 py-16 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-semibold text-indigo-200 mb-6 backdrop-blur-sm">
+            <CalendarCheck className="w-4 h-4" />
             Réservation en ligne
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
-            Réserver votre rendez-vous
+          <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
+            Prenez rendez-vous en{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-indigo-300 to-violet-300">
+              quelques clics
+            </span>
           </h1>
-          <p className="text-slate-500 text-[16px]">
-            Planifiez votre consultation en seulement 3 étapes simples.
-          </p>
+
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span className="text-white/80 text-sm">Confirmation immédiate</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+              <MapPin className="w-4 h-4 text-cyan-400" />
+              <span className="text-white/80 text-sm">Au cabinet</span>
+            </div>
+          </div>
 
           {/* Stepper */}
-          <div className="mt-10 flex items-center">
+          <div className="mt-8 flex items-center justify-center max-w-lg mx-auto">
             {steps.map((s, i) => (
-              <div key={s} className="flex items-center flex-1 last:flex-initial">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                      i < step
-                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25'
-                        : i === step
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
-                        : 'bg-slate-100 text-slate-400'
-                    }`}
-                  >
-                    {i < step ? <CheckCircle className="w-4 h-4" /> : i + 1}
+              <div key={s} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${
+                    i < step
+                      ? 'bg-emerald-500 text-white'
+                      : i === step
+                      ? 'bg-white text-indigo-700'
+                      : 'bg-white/20 text-white/50'
+                  }`}>
+                    {i < step ? <CheckCircle className="w-5 h-5" /> : i + 1}
                   </div>
-                  <span
-                    className={`text-sm font-medium hidden sm:inline ${
-                      i <= step ? 'text-slate-800' : 'text-slate-400'
-                    }`}
-                  >
-                    {s}
-                  </span>
+                  <span className={`text-xs mt-1.5 ${i === step ? 'text-white' : 'text-white/50'}`}>{s}</span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="flex-1 mx-5">
-                    <div className="h-[2px] rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className={`h-full bg-indigo-500 transition-all duration-500 ${
-                          i < step ? 'w-full' : 'w-0'
-                        }`}
-                      />
-                    </div>
-                  </div>
+                  <div className={`w-16 sm:w-24 h-0.5 mx-2 rounded ${i < step ? 'bg-emerald-500' : 'bg-white/20'}`} />
                 )}
               </div>
             ))}
@@ -112,59 +180,54 @@ export default function BookAppointment() {
         </div>
       </section>
 
-      {/* Form content */}
-      <section className="py-12 md:py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-6">
+      {/* Form */}
+      <section className="py-12 bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-x-hidden">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-100/40 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-cyan-100/40 rounded-full blur-[80px]" />
+
+        <div className="max-w-3xl mx-auto px-6 relative">
           {/* Step 1: Date & Time */}
           {step === 0 && (
-            <div className="space-y-10 animate-fade-in-up">
-              <div>
-                <h3 className="text-xl font-bold text-slate-800 mb-1.5 flex items-center gap-2.5">
+            <div className="space-y-8">
+              <div ref={timeSectionRef} className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100">
+                <h3 className="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-indigo-600" />
                   Choisir une date
                 </h3>
-                <p className="text-sm text-slate-400">Sélectionnez la date de rendez-vous souhaitée</p>
-                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2.5 mt-5">
-                  {dates.map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => update('date', d.value)}
-                      className={`p-3 rounded-2xl text-center transition-all duration-200 cursor-pointer border-2 ${
+                <p className="text-sm text-slate-400 mb-4">Sélectionnez la date souhaitée</p>
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-1 sm:gap-2 overflow-x-hidden">
+                  {dates.slice(0, 14).map((d) => (
+                    <button key={d.value} onClick={() => update('date', d.value)}
+                      className={`p-1.5 sm:p-2.5 rounded-xl text-center transition-all border-2 ${
                         form.date === d.value
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/25 scale-[1.02]'
-                          : 'bg-white border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50'
-                      }`}
-                    >
-                      <div className={`text-[10px] uppercase font-bold tracking-wider ${form.date === d.value ? 'text-indigo-200' : 'text-slate-400'}`}>
-                        {d.day}
-                      </div>
-                      <div className="text-xl font-bold mt-0.5">{d.date}</div>
-                      <div className={`text-[10px] font-medium ${form.date === d.value ? 'text-indigo-200' : 'text-slate-400'}`}>
-                        {d.month}
-                      </div>
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg'
+                          : 'border-slate-100 hover:border-indigo-200 hover:bg-indigo-50'
+                      }`}>
+                      <div className="text-[9px] sm:text-[10px] uppercase font-bold">{d.day}</div>
+                      <div className="text-base sm:text-lg font-bold">{d.date}</div>
+                      <div className="text-[9px] sm:text-[10px]">{d.month}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               {form.date && (
-                <div className="animate-fade-in-up">
-                  <h3 className="text-xl font-bold text-slate-800 mb-1.5 flex items-center gap-2.5">
-                    <Clock className="w-5 h-5 text-indigo-600" />
+                <div ref={continueButtonRef} className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 animate-fade-in-up">
+                  <h3 className="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-cyan-600" />
                     Choisir un horaire
                   </h3>
-                  <p className="text-sm text-slate-400">Créneaux disponibles pour la date sélectionnée</p>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 mt-5">
+                  <p className="text-sm text-slate-400 mb-4">
+                    {new Date(form.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </p>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 overflow-x-hidden">
                     {timeSlots.map((slot) => (
-                      <button
-                        key={slot}
-                        onClick={() => update('time', slot)}
-                        className={`py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer border-2 ${
+                      <button key={slot} onClick={() => update('time', slot)}
+                        className={`py-2.5 px-1 rounded-xl text-xs sm:text-sm font-semibold transition-all border-2 ${
                           form.time === slot
-                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-600/25'
-                            : 'bg-white border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 text-slate-700'
-                        }`}
-                      >
+                            ? 'bg-cyan-500 text-white border-cyan-500 shadow-lg'
+                            : 'border-slate-100 hover:border-cyan-200 hover:bg-cyan-50 text-slate-700'
+                        }`}>
                         {slot}
                       </button>
                     ))}
@@ -172,135 +235,128 @@ export default function BookAppointment() {
                 </div>
               )}
 
-              <div className="flex justify-end pt-6 border-t border-slate-100">
-                <Button
-                  onClick={() => setStep(1)}
-                  disabled={!form.date || !form.time}
-                  size="lg"
-                  className="px-8 hover:shadow-lg hover:shadow-indigo-600/25 hover:-translate-y-1 transition-all"
-                >
-                  Continuer
-                  <ArrowRight className="w-4 h-4" />
+              <div className="flex justify-end">
+                <Button onClick={handleContinue} disabled={!form.date || !form.time} size="lg" variant="primary" className="px-8">
+                  Continuer <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Step 2: Details */}
+          {/* Step 2: User Info */}
           {step === 1 && (
-            <div className="space-y-6 animate-fade-in-up">
-              <div>
-                <h3 className="text-xl font-bold text-slate-800 mb-1.5 flex items-center gap-2.5">
-                  <User className="w-5 h-5 text-indigo-600" />
+            <div ref={step2Ref} className="space-y-6 animate-fade-in-up">
+              <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100">
+                <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <User className="w-5 h-5 text-violet-600" />
                   Vos informations
                 </h3>
-                <p className="text-sm text-slate-400">Veuillez remplir vos coordonnées pour finaliser la réservation</p>
+
+                {/* OAuth */}
+                <div className="bg-gradient-to-br from-slate-50 to-indigo-50 rounded-2xl p-4 border border-slate-200 mb-5">
+                  <p className="text-sm text-slate-600 mb-3 text-center">Connexion rapide</p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button onClick={() => handleOAuth('google')} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 font-medium text-xs sm:text-sm text-slate-700">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      <span className="hidden sm:inline">Google</span>
+                    </button>
+                    <button onClick={() => handleOAuth('facebook')} className="flex items-center gap-1.5 px-3 py-2 bg-[#1877F2] rounded-lg font-medium text-xs sm:text-sm text-white">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      <span className="hidden sm:inline">Facebook</span>
+                    </button>
+                    <button onClick={() => handleOAuth('instagram')} className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] rounded-lg font-medium text-xs sm:text-sm text-white">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                      <span className="hidden sm:inline">Instagram</span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-400 text-center mt-2">ou remplissez le formulaire</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input label="Nom complet" icon={User} placeholder="Votre nom" value={form.name} onChange={(e) => update('name', e.target.value)} />
+                  <Input label="Téléphone" icon={Phone} placeholder="+216 XX XXX XXX" value={form.phone} onChange={(e) => update('phone', e.target.value)} />
+                </div>
+                <div className="mt-4">
+                  <Input label="Email" icon={Mail} type="email" placeholder="votre@email.com" value={form.email} onChange={(e) => update('email', e.target.value)} />
+                </div>
+                <div className="mt-4">
+                  <Textarea label="Motif de la consultation" placeholder="Symptômes, motif de visite..." value={form.reason} onChange={(e) => update('reason', e.target.value)} />
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6">
-                <Input
-                  label="Nom complet"
-                  icon={User}
-                  placeholder="Votre nom complet"
-                  value={form.name}
-                  onChange={(e) => update('name', e.target.value)}
-                />
-                <Input
-                  label="Numéro de téléphone"
-                  icon={Phone}
-                  placeholder="+216 XX XXX XXX"
-                  value={form.phone}
-                  onChange={(e) => update('phone', e.target.value)}
-                />
+              <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 flex items-start gap-3">
+                <Shield className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-emerald-700">Vos données sont sécurisées et utilisées uniquement pour vos rendez-vous.</p>
               </div>
 
-              <Input
-                label="Adresse email"
-                icon={Mail}
-                type="email"
-                placeholder="votre@email.com"
-                value={form.email}
-                onChange={(e) => update('email', e.target.value)}
-              />
-
-              <Textarea
-                label="Motif de la consultation"
-                placeholder="Décrivez brièvement vos symptômes ou motif de consultation..."
-                value={form.reason}
-                onChange={(e) => update('reason', e.target.value)}
-              />
-
-              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 flex items-start gap-3">
-                <Shield className="w-5 h-5 text-indigo-500 mt-0.5 shrink-0" />
-                <p className="text-[13px] text-slate-500 leading-relaxed">
-                  Vos informations sont sécurisées et ne seront utilisées que pour la planification des rendez-vous.
-                  Nous respectons votre vie privée.
-                </p>
-              </div>
-
-              <div className="flex justify-between pt-6 border-t border-slate-100">
-                <Button variant="secondary" onClick={() => setStep(0)} size="lg">
-                  <ArrowLeft className="w-4 h-4" />
-                  Retour
+              <div className="flex justify-between gap-4">
+                <Button variant="secondary" onClick={() => setStep(0)} className="px-5">
+                  <ArrowLeft className="w-4 h-4 mr-2" /> Retour
                 </Button>
-                <Button
-                  onClick={() => setStep(2)}
-                  disabled={!form.name || !form.phone || !form.email}
-                  size="lg"
-                  className="px-8 hover:shadow-lg hover:shadow-indigo-600/25 hover:-translate-y-1 transition-all"
-                >
-                  Confirmer la réservation
-                  <CheckCircle className="w-4 h-4" />
+                <Button onClick={handleSubmit} disabled={!form.name || !form.phone || !form.email} size="lg" variant="primary" className="px-8">
+                  Confirmer <CheckCircle className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Step 3: Confirmation */}
-          {step === 2 && (
-            <div className="space-y-8 animate-fade-in-up">
-              <div className="text-center py-8">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/30 hover:scale-110 transition-transform">
-                  <CheckCircle className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Rendez-vous confirmé !</h3>
-                <p className="text-slate-500 text-[16px]">
-                  Vous recevrez une confirmation par email et SMS sous peu.
-                </p>
+          {/* Step 3: Success */}
+          {step === 2 && success && (
+            <div ref={step3Ref} className="text-center py-8 px-4 animate-fade-in-up">
+              <div className="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+                <CheckCircle className="w-10 h-10 text-white" />
               </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Rendez-vous confirmé !</h3>
+              <p className="text-slate-500 mb-6">Confirmation envoyée par email et SMS</p>
 
-              <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                {[
-                  { label: 'Date', value: new Date(form.date).toLocaleDateString('fr', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) },
-                  { label: 'Heure', value: form.time },
-                  { label: 'Nom', value: form.name },
-                  { label: 'Téléphone', value: form.phone },
-                  { label: 'Email', value: form.email },
-                  { label: 'Motif', value: form.reason || '—' },
-                ].map((item, i) => (
-                  <div
-                    key={item.label}
-                    className={`flex justify-between items-center px-7 py-4 ${
-                      i < 5 ? 'border-b border-slate-100' : ''
-                    }`}
-                  >
-                    <span className="text-sm text-slate-400 font-medium">{item.label}</span>
-                    <span className="text-sm font-semibold text-slate-800 text-right max-w-[60%]">{item.value}</span>
+              <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 max-w-sm mx-auto text-left mb-6">
+                <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100">
+                  <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-indigo-600" />
                   </div>
-                ))}
+                  <div>
+                    <div className="font-bold text-slate-800">{success.service}</div>
+                    <div className="text-sm text-slate-500">Dr. Abir Bouthouri</div>
+                  </div>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-500">Date</span><span className="font-medium">{new Date(success.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-500">Heure</span><span className="font-medium">{success.time}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-500">Patient</span><span className="font-medium">{success.patientName}</span></div>
+                </div>
               </div>
 
-              <div className="flex justify-center pt-4">
-                <Button
-                  size="lg"
-                  onClick={() => {
-                    setStep(0)
-                    setForm({ date: '', time: '', name: '', phone: '', email: '', reason: '' })
-                  }}
-                  className="hover:shadow-lg hover:shadow-indigo-600/25 hover:-translate-y-1 transition-all"
-                >
-                  Réserver un autre RDV
-                </Button>
+              {/* Map */}
+              <div className="bg-white rounded-3xl p-4 shadow-xl border border-slate-100 max-w-sm mx-auto mb-6 overflow-hidden">
+                <div className="w-full h-40 rounded-xl overflow-hidden mb-3">
+                  <iframe src={doctor.contact.googleMapsEmbed} width="100%" height="100%" style={{ border: 0, filter: 'grayscale(20%)' }} allowFullScreen loading="lazy" title="Map" />
+                </div>
+                <div className="flex items-center gap-2 text-slate-600 text-sm mb-2">
+                  <MapPin className="w-4 h-4" />
+                  {doctor.contact.address}
+                </div>
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(doctor.contact.address)}`} target="_blank" rel="noopener" className="text-indigo-600 text-sm font-medium flex items-center justify-center gap-1">
+                  Itinéraire <ArrowRight className="w-3 h-3" />
+                </a>
+              </div>
+
+              {/* OAuth instead of "Book Another" */}
+              <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 max-w-sm mx-auto">
+                <p className="text-sm text-slate-600 mb-4">Créer un compte pour gérer vos rdvs</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <button onClick={() => handleOAuth('google')} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 font-medium text-xs sm:text-sm text-slate-700 shadow-sm">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <span className="hidden sm:inline">Google</span>
+                  </button>
+                  <button onClick={() => handleOAuth('facebook')} className="flex items-center gap-1.5 px-3 py-2 bg-[#1877F2] rounded-lg font-medium text-xs sm:text-sm text-white shadow-sm">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <span className="hidden sm:inline">Facebook</span>
+                  </button>
+                  <button onClick={() => handleOAuth('instagram')} className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] rounded-lg font-medium text-xs sm:text-sm text-white shadow-sm">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    <span className="hidden sm:inline">Instagram</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}

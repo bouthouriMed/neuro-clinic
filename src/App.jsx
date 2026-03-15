@@ -4,7 +4,9 @@ import PublicLayout from './components/layout/PublicLayout'
 import DashboardLayout from './components/layout/DashboardLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import { HeroVideoProvider } from './contexts/HeroVideoContext'
+import { AuthProvider } from './contexts/AuthContext'
 import SitePreloader from './components/ui/SitePreloader'
+import ScrollToTop from './components/ScrollToTop'
 
 const Home = lazy(() => import('./pages/public/Home'))
 const About = lazy(() => import('./pages/public/About'))
@@ -30,36 +32,39 @@ function PageLoader() {
 export default function App() {
   return (
     <HeroVideoProvider>
-      <BrowserRouter>
-      <Suspense fallback={<SitePreloader isLoading={true} />}>
-          <Routes>
-          {/* Public Website */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/book" element={<BookAppointment />} />
-            <Route path="/contact" element={<Contact />} />
-          </Route>
+      <AuthProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Suspense fallback={<SitePreloader isLoading={true} />}>
+            <Routes>
+            {/* Public Website */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/book" element={<BookAppointment />} />
+              <Route path="/contact" element={<Contact />} />
+            </Route>
 
-          {/* Login */}
-          <Route path="/login" element={<Login />} />
+            {/* Login */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Doctor Dashboard (Protected) */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<Overview />} />
-            <Route path="appointments" element={<Appointments />} />
-            <Route path="patients" element={<Patients />} />
-            <Route path="calendar" element={<CalendarView />} />
-            <Route path="notifications" element={<Notifications />} />
-          </Route>
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+            {/* Doctor Dashboard (Protected) */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Overview />} />
+              <Route path="appointments" element={<Appointments />} />
+              <Route path="patients" element={<Patients />} />
+              <Route path="calendar" element={<CalendarView />} />
+              <Route path="notifications" element={<Notifications />} />
+            </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </AuthProvider>
     </HeroVideoProvider>
   )
 }
