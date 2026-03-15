@@ -47,8 +47,10 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Content */}
-      <section className="py-24 bg-slate-50">
+      {/* Content - Enhanced with gradient background */}
+      <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-100/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-100/50 rounded-full blur-[100px]" />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
             {/* Left — Contact info */}

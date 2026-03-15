@@ -24,6 +24,16 @@ const gradients = [
   'from-blue-500 to-blue-600',
   'from-rose-500 to-pink-600',
   'from-amber-500 to-orange-500',
+  'from-emerald-500 to-teal-600',
+  'from-cyan-500 to-blue-600',
+  'from-fuchsia-500 to-purple-600',
+  'from-orange-500 to-red-600',
+  'from-sky-500 to-indigo-600',
+  'from-lime-500 to-green-600',
+  'from-rose-500 to-red-600',
+  'from-violet-500 to-fuchsia-600',
+  'from-indigo-500 to-cyan-600',
+  'from-purple-500 to-pink-600',
 ]
 
 export default function Services() {
@@ -75,8 +85,11 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Services grid */}
-      <section className="py-24 bg-white">
+      {/* Services grid - Enhanced with gradient background */}
+      <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-100/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-100/50 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-teal-100/40 rounded-full blur-[80px]" />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {services.map((service, i) => {

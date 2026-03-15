@@ -6,37 +6,43 @@ import { doctor } from '../../data/mockData'
 export default function About() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden" style={{ paddingTop: '20px' }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30" />
-        <div className="absolute inset-0 grid-pattern opacity-50" />
-        <div className="absolute top-[20%] right-[5%] w-[400px] h-[400px] bg-indigo-400/10 rounded-full blur-[100px]" />
+      {/* Hero - Different color scheme (emerald/teal) */}
+      <section className="relative overflow-hidden min-h-[60vh] flex items-center">
+        {/* Different color scheme - emerald/teal instead of indigo/violet */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-emerald-950 to-teal-900" />
+        <div className="absolute inset-0 dot-pattern opacity-[0.05]" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[150px] animate-pulse-glow" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-teal-500/15 rounded-full blur-[120px] animate-morph" />
+        <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] bg-cyan-500/10 rounded-full blur-[100px]" />
+        
+        {/* Neural pattern overlay */}
+        <div className="absolute inset-0 neural-pattern opacity-10" />
 
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 md:py-28">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-32 md:py-40">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200/80 shadow-sm text-xs font-semibold text-indigo-600 mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-semibold text-emerald-200 mb-6 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4" />
                 À propos du médecin
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-6">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight mb-6">
                 Dédié à l'excellence{' '}
-                <span className="text-gradient">neurologique</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300">neurologique</span>
               </h1>
-              <p className="text-lg text-slate-500 leading-relaxed mb-8">
+              <p className="text-xl text-emerald-200/80 leading-relaxed max-w-xl mb-8">
                 {doctor.bio}
               </p>
               <Link to="/book" className="no-underline">
-                <Button size="lg" className="shadow-xl shadow-indigo-600/25 hover:shadow-xl hover:shadow-indigo-600/30 hover:-translate-y-1 transition-all">
+                <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50 shadow-xl shadow-emerald-900/20 hover:shadow-emerald-900/30 hover:-translate-y-1 transition-all border-0">
                   Réserver une consultation
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
 
-            {/* Doctor card */}
+            {/* Doctor card - emerald themed */}
             <div className="hidden lg:block">
-              <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800 rounded-3xl p-10 shadow-2xl shadow-indigo-900/30 relative overflow-hidden hover:shadow-indigo-500/20 transition-shadow">
+              <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 rounded-3xl p-10 shadow-2xl shadow-emerald-900/30 relative overflow-hidden hover:shadow-emerald-500/20 transition-shadow">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
@@ -45,13 +51,13 @@ export default function About() {
                     <Brain className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-1">{doctor.name}</h3>
-                  <p className="text-indigo-200 font-medium mb-6">{doctor.title}</p>
+                  <p className="text-emerald-200 font-medium mb-6">{doctor.title}</p>
 
                   <div className="space-y-3">
                     {doctor.specializations.map((spec) => (
                       <div key={spec} className="flex items-center gap-3">
                         <CheckCircle2 className="w-4 h-4 text-teal-300 shrink-0" />
-                        <span className="text-indigo-100 text-sm">{spec}</span>
+                        <span className="text-emerald-100 text-sm">{spec}</span>
                       </div>
                     ))}
                   </div>
@@ -62,9 +68,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* Education Timeline */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* Education Timeline - Enhanced with gradient */}
+      <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-emerald-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-100/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-100/50 rounded-full blur-[100px]" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="flex items-center gap-4 mb-14">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
               <GraduationCap className="w-6 h-6 text-white" />
@@ -94,9 +102,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* Specializations */}
-      <section className="py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* Specializations - Enhanced with gradient */}
+      <section className="py-24 bg-gradient-to-br from-emerald-50 via-white to-teal-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-100/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-100/50 rounded-full blur-[100px]" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="flex items-center gap-4 mb-14">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/25">
               <Brain className="w-6 h-6 text-white" />
@@ -128,9 +138,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      {/* Values - Enhanced with gradient */}
+      <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-indigo-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-100/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-100/50 rounded-full blur-[100px]" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
           <div className="flex items-center gap-4 mb-14">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
               <Heart className="w-6 h-6 text-white" />
