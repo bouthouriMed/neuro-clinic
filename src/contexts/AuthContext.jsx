@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { authApi } from '../services/api'
 
 const AuthContext = createContext(null)
-
-const API_URL = import.meta.env.VITE_API_URL || ''
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -14,13 +13,8 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/user`, {
-        credentials: 'include'
-      })
-      if (res.ok) {
-        const userData = await res.json()
-        setUser(userData)
-      }
+      const userData = await authApi.getUser()
+      setUser(userData)
     } catch (error) {
       console.error('Auth check failed:', error)
     } finally {
@@ -28,24 +22,32 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const login = async (email, password) => {
+    const data = await authApi.login({ email, password })
+    setUser(data.user)
+    return data
+  }
+
+  const register = async (userData) => {
+    const data = await authApi.register(userData)
+    return data
+  }
+
   const loginWithGoogle = () => {
-    window.open(`${API_URL}/api/auth/google`, '_self')
+    window.open(`${import.meta.env.VITE_API_URL}/api/auth/google`, '_self')
   }
 
   const loginWithFacebook = () => {
-    window.open(`${API_URL}/api/auth/facebook`, '_self')
+    window.open(`${import.meta.env.VITE_API_URL}/api/auth/facebook`, '_self')
   }
 
   const loginWithInstagram = () => {
-    window.open(`${API_URL}/api/auth/instagram`, '_self')
+    window.open(`${import.meta.env.VITE_API_URL}/api/auth/instagram`, '_self')
   }
 
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/api/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      })
+      await authApi.logout()
       setUser(null)
     } catch (error) {
       console.error('Logout failed:', error)
@@ -55,7 +57,9 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{ 
       user, 
-      loading, 
+      loading,
+      login,
+      register, 
       loginWithGoogle, 
       loginWithFacebook, 
       loginWithInstagram,

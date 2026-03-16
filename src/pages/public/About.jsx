@@ -177,11 +177,11 @@ const bioParts = [
                 <div className="flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 mb-8">
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5 text-emerald-400" />
-                    <span className="text-emerald-200 text-sm">15+ années</span>
+                    <span className="text-emerald-200 text-sm">13 années</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Heart className="w-5 h-5 text-emerald-400" />
-                    <span className="text-emerald-200 text-sm">10K+ patients</span>
+                    <span className="text-emerald-200 text-sm">1000+ patients</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Star className="w-5 h-5 text-emerald-400" />
@@ -208,49 +208,10 @@ const bioParts = [
         <div className="absolute inset-0 bg-white/5" />
         <div className="max-w-7xl mx-auto px-6 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <StatCard number={15} suffix="+" label="Années d'expérience" delay={0} />
-            <StatCard number={10} suffix="K+" label="Patients traités" delay={100} />
+            <StatCard number={13} suffix="" label="Années d'expérience" delay={0} />
+            <StatCard number={1000} suffix="+" label="Patients traités" delay={0} />
             <StatCard number={98} suffix="%" label="Taux de satisfaction" delay={200} />
             <StatCard number={50} suffix="+" label="Publications" delay={300} />
-          </div>
-        </div>
-      </section>
-
-      {/* Education */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-emerald-50 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-emerald-100/50 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-100/50 rounded-full blur-[80px]" />
-        
-        <div className="max-w-4xl mx-auto px-6">
-          <ScrollReveal>
-            <div className="flex items-center gap-4 mb-12">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                <GraduationCap className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Formation & Parcours</h2>
-                <p className="text-slate-500 text-sm mt-1">Les étapes clés de votre parcours médical</p>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          <div className="space-y-4">
-            {doctor.education.map((edu, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:shadow-slate-200/50 hover:-translate-y-0.5 transition-all duration-300 group">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                    <div className="shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <span className="text-lg font-bold text-indigo-600">{edu.year}</span>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-slate-800">{edu.degree}</h3>
-                      <p className="text-slate-500 mt-1">{edu.institution}</p>
-                    </div>
-                    <Award className="w-5 h-5 text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
           </div>
         </div>
       </section>

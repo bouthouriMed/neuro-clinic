@@ -5,9 +5,9 @@ import {
   Calendar,
   Users,
   Bell,
-  Settings,
   LogOut,
   ChevronLeft,
+  X,
 } from 'lucide-react'
 import { notifications } from '../../data/mockData'
 
@@ -19,7 +19,7 @@ const navItems = [
   { to: '/dashboard/notifications', icon: Bell, label: 'Notifications' },
 ]
 
-export default function DashboardSidebar({ collapsed, onToggle }) {
+export default function DashboardSidebar({ collapsed, mobileOpen, onToggle, onMobileClose }) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const unreadCount = notifications.filter((n) => !n.read).length
@@ -32,14 +32,28 @@ export default function DashboardSidebar({ collapsed, onToggle }) {
     navigate('/login')
   }
 
+  const handleNavClick = () => {
+    if (mobileOpen) onMobileClose()
+  }
+
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-slate-900 border-r border-slate-800 flex flex-col transition-all duration-300 z-40 ${
+      className={`fixed top-0 left-0 h-screen bg-slate-900 border-r border-slate-800 flex flex-col transition-all duration-300 z-50 ${
         collapsed ? 'w-[72px]' : 'w-[260px]'
+      } ${
+        mobileOpen 
+          ? 'translate-x-0' 
+          : '-translate-x-full lg:translate-x-0'
       }`}
     >
       <div className="h-16 flex items-center px-5 border-b border-slate-800 gap-3">
-        <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 hover:scale-105 transition-transform">
+        <button 
+          onClick={onMobileClose}
+          className="lg:hidden absolute top-4 right-4 p-1 text-slate-400 hover:text-white transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shrink-0 hover:scale-105 transition-transform shadow-lg shadow-indigo-500/25">
           <Brain className="w-5 h-5 text-white" />
         </div>
         {!collapsed && (
@@ -55,6 +69,7 @@ export default function DashboardSidebar({ collapsed, onToggle }) {
           <Link
             key={item.to}
             to={item.to}
+            onClick={handleNavClick}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors no-underline relative ${
               isActive(item)
                 ? 'bg-indigo-600/15 text-indigo-400'
@@ -90,7 +105,7 @@ export default function DashboardSidebar({ collapsed, onToggle }) {
         </button>
         <button
           onClick={onToggle}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors w-full cursor-pointer"
+          className="hidden lg:flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors w-full cursor-pointer"
         >
           <ChevronLeft
             className={`w-5 h-5 shrink-0 transition-transform duration-300 ${

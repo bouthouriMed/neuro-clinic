@@ -1,24 +1,33 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Brain, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Brain, Lock, Eye, EyeOff, ArrowRight, Mail } from 'lucide-react'
 import Button from '../../components/ui/Button'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function Login() {
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   
   const from = location.state?.from?.pathname || '/dashboard'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (password.toLowerCase() === 'abir') {
-      localStorage.setItem('neuroclinic_auth', 'true')
+    setError('')
+    setLoading(true)
+    
+    try {
+      await login(email, password)
       navigate(from, { replace: true })
-    } else {
-      setError('Mot de passe incorrect')
+    } catch (err) {
+      setError(err.message || 'Échec de la connexion')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -41,6 +50,27 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-indigo-200 mb-2">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setError('')
+                  }}
+                  placeholder="votre@email.com"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  autoFocus
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-indigo-200 mb-2">
                 Mot de passe
               </label>
               <div className="relative">
@@ -54,7 +84,7 @@ export default function Login() {
                   }}
                   placeholder="Entrez votre mot de passe"
                   className="w-full pl-12 pr-12 py-3.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
-                  autoFocus
+                  required
                 />
                 <button
                   type="button"
@@ -72,15 +102,12 @@ export default function Login() {
             <Button
               type="submit"
               size="lg"
-              className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all group"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Se connecter
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {loading ? 'Connexion...' : 'Se connecter'}
+              {!loading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
             </Button>
-            
-            <p className="text-center text-sm text-indigo-300/60">
-              Mot de passe démo: <span className="text-indigo-200 font-mono">abir</span>
-            </p>
           </form>
 
           <div className="mt-6 text-center">

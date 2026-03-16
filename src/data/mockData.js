@@ -33,7 +33,7 @@ export const doctor = {
     { title: 'Neurologue', place: 'Institut National de Neurologie Mongi Ben Hamida, Tunis', period: '2013', type: 'Stage' },
   ],
   contact: {
-    address: `8ème étage, B82, Centre Médical ''Le Carré Blanc'', en face de l'hôpital Farhat Hached, IBN EL Jazzar St, Sousse 4000`,
+    address: `Avenue Ibn Eljazzar, Centre médical 'Le carré BLanc' en face de l'hôpital Farhat Hached, 8ème étage, bureau B82`,
     phone: '+216 95 687 895',
     whatsapp: '+216 55 175 560',
     email: 'cab.neurologie@gmail.com',
