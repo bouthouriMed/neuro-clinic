@@ -4,8 +4,8 @@ import { doctor } from '../../data/mockData'
 
 export default function PublicFooter() {
   return (
-    <footer className="bg-slate-900 text-slate-300">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+    <footer className="bg-slate-900 text-slate-300 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4 group">
@@ -34,9 +34,12 @@ export default function PublicFooter() {
                 <Mail className="w-4 h-4" />
               </a>
             </div>
-            <div className="flex items-center gap-2 mt-4 text-sm text-slate-500">
-              <Clock className="w-4 h-4 text-teal-500" />
-              <span>Lun - Sam: 9h00 - 18h00</span>
+            <div className="flex items-start gap-2 mt-4 text-sm text-slate-500">
+              <Clock className="w-4 h-4 text-teal-500 mt-0.5 shrink-0" />
+              <div>
+                <div><span className="font-semibold text-slate-300">Lun - Ven:</span> 8h30 - 12h00 &amp; 14h00 - 16h30</div>
+                <div><span className="font-semibold text-slate-300">Sam:</span> 9h00 - 13h30</div>
+              </div>
             </div>
           </div>
 

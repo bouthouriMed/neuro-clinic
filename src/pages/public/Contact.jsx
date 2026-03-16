@@ -8,8 +8,34 @@ const contactInfo = [
   { icon: MapPin, label: 'Venez nous voir', value: doctor.contact.address, color: 'from-indigo-500 to-indigo-600' },
   { icon: Phone, label: 'Appelez-nous', value: doctor.contact.whatsapp, color: 'from-teal-500 to-teal-600' },
   { icon: Mail, label: 'Email', value: doctor.contact.email, color: 'from-violet-500 to-purple-600' },
-  { icon: Clock, label: 'Horaires', value: 'Lun - Sam: 9h00 - 18h00', color: 'from-amber-500 to-orange-500' },
+  { 
+    icon: Clock, 
+    label: 'Horaires', 
+    value: null,
+    schedule: [
+      { days: 'Lun - Ven', slots: ['8h30 - 12h00', '14h00 - 16h30'] },
+      { days: 'Sam', slots: ['9h00 - 13h30'] }
+    ],
+    color: 'from-amber-500 to-orange-500' 
+  },
 ]
+
+function ScheduleDisplay({ schedule }) {
+  return (
+    <div className="space-y-1">
+      {schedule.map((item, idx) => (
+        <div key={idx} className="flex">
+          <span className="font-semibold w-20 shrink-0">{item.days}: </span>
+          <div className="pl-2">
+            {item.slots.map((slot, sIdx) => (
+              <div key={sIdx}>{slot}</div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function Contact() {
   const phoneNumber = doctor.contact.whatsapp.replace(/\s+/g, '').replace(/\+/g, '')
@@ -65,7 +91,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <div className="text-sm font-bold text-slate-800">{item.label}</div>
-                    <div className="text-[13px] text-slate-500 mt-1 leading-relaxed">{item.value}</div>
+                    <div className="text-[13px] text-slate-500 mt-1 leading-relaxed">
+                      {item.schedule ? <ScheduleDisplay schedule={item.schedule} /> : item.value}
+                    </div>
                   </div>
                 </div>
               ))}

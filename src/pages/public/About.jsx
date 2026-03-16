@@ -78,12 +78,12 @@ function StatCard({ number, suffix, label, delay }) {
 export default function About() {
   const [bioExpanded, setBioExpanded] = useState(false)
 
-  const bioParts = [
-    "Avec plus de 15 ans d'expérience en neurologie, le Dr. Abir Bouthouri offre des soins neurologiques complets utilisant les dernières techniques diagnostiques et traitements basés sur les preuves.",
-    "Diplômé de la Faculté de Médecine de Monastir avec une spécialisation en neurologie, il a perfectionné ses compétences dans les plus grands hôpitaux de Tunisie.",
-    "Il a travaillé à l'Hôpital Militaire de Tunis, l'Institut National de Neurologie Mongi Ben Hamida, l'Hôpital Universitaire Sahloul, l'Hôpital Farhat Hachad, et en Arabie Saoudite à l'Hôpital Mouwasat de Riyad.",
-    "Membre de l'Académie Américaine de Neurologie, il est spécialisé dans le diagnostic et le traitement des troubles neurologiques, l'épilepsie, la maladie de Parkinson, et la gestion des accidents vasculaires cérébraux."
-  ]
+const bioParts = [
+  `Diplômée de la Faculté de Médecine de Tunis, le Dr Abir Bouthouri est neurologue avec plus de 13 ans d’expérience dans le diagnostic et la prise en charge des pathologies neurologiques. Au cours de sa carrière, elle a exercé dans plusieurs établissements hospitaliers de référence en Tunisie, à Tunis (Hôpital Militaire, Institut National de Neurologie Mongi Ben Hmida) et à Sousse (Hôpital Universitaire Sahloul, Hôpital Farhat Hached, Hôpital Régional de M’saken et Hôpital Régional de Kalaa Kebira).`,
+  `Elle a également enrichi son expertise à l’international en tant que médecin consultante à Mouwasat Hospital à Riyadh, en Arabie Saoudite, adoptant les standards médicaux internationaux pour la prise en charge des maladies neurologiques. Son champ de compétence couvre le diagnostic et le traitement des maladies du système nerveux central et périphérique.`,
+  `Elle prend notamment en charge l’épilepsie, la maladie de Parkinson, les céphalées et migraines, les vertiges et troubles de l’équilibre, les troubles de la mémoire, les neuropathies et paralysies faciales, ainsi que la prévention et la prise en charge des accidents vasculaires cérébraux (AVC). Le Dr Bouthouri propose également des explorations fonctionnelles spécialisées telles que l’électroencéphalogramme (EEG) et l’électromyographie (EMG).`,
+  `Au fil de sa pratique, elle a accompagné plus de 1000 patients, plaçant l’écoute, le suivi personnalisé et la qualité des soins au cœur de sa démarche. Elle vous accueille au cabinet NeuroClinic, situé au Centre Médical Le Carré Blanc, en face de l’Hôpital Farhat Hached à Sousse, bureau B82, dans un environnement professionnel dédié à la qualité des soins et au bien-être des patients.`
+];
 
   return (
     <>

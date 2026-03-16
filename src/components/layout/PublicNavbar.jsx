@@ -153,8 +153,8 @@ export default function PublicNavbar() {
           />
           
           {/* Menu Content - Green for About, Dark for others */}
-          <div ref={menuRef} className="absolute left-4 right-4 top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-            <div className="relative overflow-hidden rounded-3xl"
+          <div ref={menuRef} className="absolute left-3 right-3 top-16 max-h-[calc(100vh-5rem)] overflow-y-auto">
+            <div className="relative overflow-hidden rounded-2xl"
               style={{
                 background: isAboutPage
                   ? 'linear-gradient(180deg, rgba(6,78,59,0.95) 0%, rgba(6,78,59,0.92) 100%)'
@@ -166,80 +166,80 @@ export default function PublicNavbar() {
                   : '1px solid rgba(255,255,255,0.15)',
               }}
             >
-              <div className="relative p-5 space-y-3">
+              <div className="relative p-3 space-y-2">
                 {/* Logo Header */}
-                <div className="flex items-center justify-center gap-3 pb-4 border-b"
+                <div className="flex items-center justify-center gap-2 pb-3 border-b"
                   style={{ borderColor: isAboutPage ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)' }}>
                   {/* Premium Crystal Logo */}
                   <div className="relative">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-lg ${
                       isAboutPage 
                         ? 'bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-700' 
                         : 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600'
                     }`}>
-                      <Brain className="w-5 h-5 text-white" />
+                      <Brain className="w-4 h-4 text-white" />
                     </div>
                     {/* Crystal shine */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/30 via-transparent to-transparent pointer-events-none" />
                     {/* Diamond sparkle */}
-                    <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-white/90 rounded-sm rotate-45 shadow-lg" 
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-white/90 rounded-sm rotate-45 shadow-lg" 
                       style={{ boxShadow: '0 0 8px rgba(255,255,255,0.8)' }}
                     />
                   </div>
                   <div className="text-center">
-                    <span className={`block font-bold ${isAboutPage ? 'text-white' : 'text-white'}`}>NeuroClinic</span>
-                    <span className={`text-xs ${isAboutPage ? 'text-white/70' : 'text-white/70'}`}>Dr. Abir Bouthouri</span>
+                    <span className={`block text-sm font-bold ${isAboutPage ? 'text-white' : 'text-white'}`}>NeuroClinic</span>
+                    <span className={`text-[10px] ${isAboutPage ? 'text-white/70' : 'text-white/70'}`}>Dr. Abir Bouthouri</span>
                   </div>
                 </div>
 
                 {/* Navigation Links - High contrast */}
-                <div className="space-y-2 pt-3">
+                <div className="space-y-1 pt-2">
                   {links.map((link, index) => (
                     <Link key={link.to} to={link.to} onClick={() => setOpen(false)}
-                      className="flex items-center justify-between px-5 py-4 rounded-2xl font-semibold text-base no-underline transition-all duration-300"
+                      className="flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm no-underline transition-all duration-300"
                       style={{ 
                         animationDelay: `${index * 60}ms`,
                         background: pathname === link.to 
                           ? isAboutPage 
                             ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%)'
                             : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'
-                          : (isAboutPage ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.1)'),
-                        color: isAboutPage ? '#fff' : (pathname === link.to ? '#fff' : '#fff'),
+                          : (isAboutPage ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)'),
+                        color: pathname === link.to ? '#fff' : (isAboutPage ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.7)'),
                         boxShadow: pathname === link.to 
                           ? isAboutPage 
                             ? '0 8px 32px rgba(255,255,255,0.2)' 
                             : '0 8px 32px rgba(79,70,229,0.4)'
                           : 'none',
-                        border: isAboutPage ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.1)'
+                        border: isAboutPage ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.05)'
                       }}>
-                      <span className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                      <span className="flex items-center gap-2">
+                        <span className={`w-6 h-6 rounded-lg flex items-center justify-center ${
                           pathname === link.to 
                             ? 'bg-white/20' 
                             : (isAboutPage ? 'bg-white/15' : 'bg-white/10')
                         }`}>
                           {pathname === link.to ? (
-                            <ChevronRight className="w-4 h-4" />
+                            <ChevronRight className="w-3 h-3" />
                           ) : (
-                            <span className="w-2 h-2 rounded-full bg-current opacity-60" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
                           )}
                         </span>
                         {link.label}
                       </span>
                       {pathname === link.to && (
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-3 h-3" />
                       )}
                     </Link>
                   ))}
                 </div>
 
                 {/* Divider */}
-                <div className="relative py-3">
+                <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t" style={{ borderColor: isAboutPage ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)' }} />
                   </div>
                   <div className="relative flex justify-center">
-                    <span className={`px-4 text-xs font-medium uppercase tracking-widest ${
+                    <span className={`px-3 text-[10px] font-medium uppercase tracking-widest ${
                       isAboutPage 
                         ? 'bg-emerald-600 text-white' 
                         : 'bg-slate-800 text-white/40'
@@ -251,33 +251,33 @@ export default function PublicNavbar() {
 
                 {/* Doctor Login */}
                 <Link to="/dashboard" onClick={() => setOpen(false)} 
-                  className="flex items-center justify-between px-5 py-4 rounded-2xl font-semibold text-base no-underline transition-all duration-300"
+                  className="flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm no-underline transition-all duration-300"
                   style={{ 
-                    background: isAboutPage ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.1)',
-                    color: isAboutPage ? '#fff' : 'rgba(255,255,255,0.9)',
-                    border: isAboutPage ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(255,255,255,0.1)'
+                    background: isAboutPage ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+                    color: isAboutPage ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.7)',
+                    border: isAboutPage ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.05)'
                   }}>
-                  <span className="flex items-center gap-3">
-                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center ${isAboutPage ? 'bg-white/15' : 'bg-white/10'}`}>
-                      <span className="w-2 h-2 rounded-full bg-current opacity-60" />
+                  <span className="flex items-center gap-2">
+                    <span className={`w-6 h-6 rounded-lg flex items-center justify-center ${isAboutPage ? 'bg-white/15' : 'bg-white/10'}`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
                     </span>
                     Espace Médecin
                   </span>
-                  <ChevronRight className="w-4 h-4 opacity-40" />
+                  <ChevronRight className="w-3 h-3 opacity-40" />
                 </Link>
 
                 {/* Book Appointment CTA */}
-                <Link to="/book" onClick={() => setOpen(false)} className="no-underline block pt-2">
-                  <div className="relative overflow-hidden rounded-2xl">
-                    <div className={`absolute inset-0 rounded-2xl ${
+                <Link to="/book" onClick={() => setOpen(false)} className="no-underline block pt-1">
+                  <div className="relative overflow-hidden rounded-xl">
+                    <div className={`absolute inset-0 rounded-xl ${
                       isAboutPage 
                         ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500' 
                         : 'bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500'
                     }`}
                       style={{ animation: 'gradient-shift 3s ease infinite', backgroundSize: '200% 200%' }} />
-                    <div className="relative rounded-2xl px-5 py-4 font-bold text-base flex items-center justify-center gap-3 text-white">
-                      <span className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
-                        <ChevronRight className="w-4 h-4" />
+                    <div className="relative rounded-xl px-4 py-3 font-semibold text-sm flex items-center justify-center gap-2 text-white">
+                      <span className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
+                        <ChevronRight className="w-3 h-3" />
                       </span>
                       Prendre Rendez-vous
                     </div>
@@ -285,8 +285,8 @@ export default function PublicNavbar() {
                 </Link>
 
                 {/* Footer */}
-                <div className="text-center pt-6">
-                  <p className={`text-xs ${isAboutPage ? 'text-white/60' : 'text-white/40'}`}>
+                <div className="text-center pt-4">
+                  <p className={`text-[10px] ${isAboutPage ? 'text-white/60' : 'text-white/40'}`}>
                     NeuroClinic • Dr. Abir Bouthouri
                   </p>
                 </div>

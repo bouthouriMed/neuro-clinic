@@ -156,8 +156,8 @@ export default function Services() {
             {/* Animated Stats */}
             <ScrollReveal delay={200}>
               <div className="flex flex-wrap justify-center gap-6 md:gap-8 mt-10 pt-8 border-t border-white/10">
-                <AnimatedStat end={15} suffix="+" label="Années exp" delay={400} />
-                <AnimatedStat end={10} suffix="K+" label="Patients" delay={600} />
+                <AnimatedStat end={10} suffix="+" label="Années exp" delay={400} />
+                <AnimatedStat end={1} suffix="K+" label="Patients" delay={600} />
                 <AnimatedStat end={98} suffix="%" label="Satisfaction" delay={800} />
               </div>
             </ScrollReveal>

@@ -80,7 +80,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-    }, 6000)
+    }, 20000)
     return () => clearInterval(timer)
   }, [])
 
@@ -131,16 +131,16 @@ export default function Home() {
   }
 
   const stats = [
-    { value: '15+', label: "Années d'expérience", suffix: '' },
-    { value: '10K+', label: 'Patients traités', suffix: '' },
+    { value: '10+', label: "Années d'expérience", suffix: '' },
+    { value: '1000+', label: 'Patients traités', suffix: '' },
     { value: '98%', label: 'Taux de satisfaction', suffix: '%' },
     { value: '8', label: 'Spécialisations', suffix: '' },
   ]
 
   const trustSignals = [
-    { icon: Shield, title: 'Certifié', desc: "Membre de l'Académie Américaine de Neurologie. Board Saoudien de Neurologie.", gradient: 'from-indigo-500 to-indigo-600' },
+    { icon: Award, title: 'Expertise Reconnue', desc: "Plus de 10 ans d'expérience en neurologie avec des centimes de patients traités.", gradient: 'from-indigo-500 to-indigo-600' },
     { icon: Calendar, title: 'RDV Facile', desc: 'Prenez rendez-vous en ligne en quelques clics, 24h/24.', gradient: 'from-cyan-500 to-teal-500' },
-    { icon: Award, title: 'Hôpital Mouwasat', desc: "Plus de 6 ans d'expérience à l'hôpital Mouwasat de Riyad.", gradient: 'from-violet-500 to-purple-600' },
+    { icon: Heart, title: 'Soins Personnalisés', desc: 'Une approche humaine et attentive pour chaque patient.', gradient: 'from-violet-500 to-purple-600' },
   ]
 
   const serviceColors = [
@@ -193,9 +193,9 @@ export default function Home() {
               <Activity className="w-4 h-4" />
               Notre Expertise
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Services neurologiques specialises</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Services neurologiques specialisés</h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-              Soins complets pour le spectre complet des conditions neurologiques, du diagnostic a la gestion a long terme.
+              Soins complets pour le spectre complet des conditions neurologiques, du diagnostic à la gestion à long terme.
             </p>
           </div>
 

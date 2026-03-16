@@ -220,18 +220,53 @@ export default function BookAppointment() {
                   <p className="text-sm text-slate-400 mb-4">
                     {new Date(form.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </p>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 overflow-x-hidden">
-                    {timeSlots.map((slot) => (
-                      <button key={slot} onClick={() => update('time', slot)}
-                        className={`py-2.5 px-1 rounded-xl text-xs sm:text-sm font-semibold transition-all border-2 ${
-                          form.time === slot
-                            ? 'bg-cyan-500 text-white border-cyan-500 shadow-lg'
-                            : 'border-slate-100 hover:border-cyan-200 hover:bg-cyan-50 text-slate-700'
-                        }`}>
-                        {slot}
-                      </button>
-                    ))}
-                  </div>
+                  {(() => {
+                    const selectedDate = new Date(form.date)
+                    const isSaturday = selectedDate.getDay() === 6
+                    const morningSlots = isSaturday 
+                      ? ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00']
+                      : ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30']
+                    const afternoonSlots = isSaturday ? [] : ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30']
+                    
+                    return (
+                      <div className="space-y-4">
+                        <div>
+                          <div className="text-xs font-semibold text-slate-600 mb-2">
+                            {isSaturday ? `Matin (9h00 - 13h30)` : `Matin (8h30 - 12h00)`}
+                          </div>
+                          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                            {morningSlots.map((slot) => (
+                              <button key={slot} onClick={() => update('time', slot)}
+                                className={`py-2.5 px-1 rounded-xl text-xs sm:text-sm font-semibold transition-all border-2 ${
+                                  form.time === slot
+                                    ? 'bg-cyan-500 text-white border-cyan-500 shadow-lg'
+                                    : 'border-slate-100 hover:border-cyan-200 hover:bg-cyan-50 text-slate-700'
+                                }`}>
+                                {slot}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        {afternoonSlots.length > 0 && (
+                          <div>
+                            <div className="text-xs font-semibold text-slate-600 mb-2">Après-midi (14h00 - 16h30)</div>
+                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                              {afternoonSlots.map((slot) => (
+                                <button key={slot} onClick={() => update('time', slot)}
+                                  className={`py-2.5 px-1 rounded-xl text-xs sm:text-sm font-semibold transition-all border-2 ${
+                                    form.time === slot
+                                      ? 'bg-cyan-500 text-white border-cyan-500 shadow-lg'
+                                      : 'border-slate-100 hover:border-cyan-200 hover:bg-cyan-50 text-slate-700'
+                                  }`}>
+                                  {slot}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
 
