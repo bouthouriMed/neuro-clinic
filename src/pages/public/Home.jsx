@@ -133,7 +133,7 @@ export default function Home() {
   const stats = [
     { value: '10+', label: "Années d'expérience", suffix: '' },
     { value: '1000+', label: 'Patients traités', suffix: '' },
-    { value: '98%', label: 'Taux de satisfaction', suffix: '%' },
+    { value: '98', label: 'Taux de satisfaction', suffix: '%' },
     { value: '8', label: 'Spécialisations', suffix: '' },
   ]
 
