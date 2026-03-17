@@ -85,8 +85,8 @@ export default function PublicFooter() {
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-500">© {new Date().getFullYear()} NeuroClinic – Dr. Abir Bouthouri. Tous droits réservés.</p>
           <div className="flex gap-4 text-sm text-slate-600">
-            <span className="hover:text-slate-400 cursor-pointer transition-colors">Politique de confidentialité</span>
-            <span className="hover:text-slate-400 cursor-pointer transition-colors">Conditions d'utilisation</span>
+            <Link to="/data-deletion" className="hover:text-slate-400 transition-colors no-underline">Politique de suppression des données</Link>
+            <Link to="/terms" className="hover:text-slate-400 transition-colors no-underline">Conditions d'utilisation</Link>
           </div>
         </div>
       </div>

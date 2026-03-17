@@ -14,6 +14,8 @@ const Services = lazy(() => import('./pages/public/Services'))
 const BookAppointment = lazy(() => import('./pages/public/BookAppointment'))
 const Contact = lazy(() => import('./pages/public/Contact'))
 const Login = lazy(() => import('./pages/public/Login'))
+const TermsAndConditions = lazy(() => import('./pages/public/TermsAndConditions'))
+const DataDeletion = lazy(() => import('./pages/public/DataDeletion'))
 
 const Overview = lazy(() => import('./pages/dashboard/Overview'))
 const Appointments = lazy(() => import('./pages/dashboard/Appointments'))
@@ -44,6 +46,8 @@ export default function App() {
               <Route path="/services" element={<Services />} />
               <Route path="/book" element={<BookAppointment />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/data-deletion" element={<DataDeletion />} />
             </Route>
 
             {/* Login */}
