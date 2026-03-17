@@ -32,6 +32,10 @@ export const authApi = {
   logout: () => fetchApi('/api/auth/logout', { method: 'POST' }),
   getUser: () => fetchApi('/api/auth/user'),
   getStatus: () => fetchApi('/api/auth/status'),
+  checkEmail: (email) => fetchApi(`/api/auth/check-email/${encodeURIComponent(email)}`),
+  upsertFromBooking: (data) => fetchApi('/api/auth/upsert-from-booking', { method: 'POST', body: data }),
+  loginWithGoogle: () => window.open(`${API_URL}/api/auth/google`, '_self'),
+  loginWithFacebook: () => window.open(`${API_URL}/api/auth/facebook`, '_self'),
 }
 
 export const appointmentsApi = {
@@ -45,6 +49,7 @@ export const appointmentsApi = {
 export const usersApi = {
   getAll: () => fetchApi('/api/users'),
   getById: (id) => fetchApi(`/api/users/${id}`),
+  create: (data) => fetchApi('/api/users', { method: 'POST', body: data }),
   update: (id, data) => fetchApi(`/api/users/${id}`, { method: 'PUT', body: data }),
   delete: (id) => fetchApi(`/api/users/${id}`, { method: 'DELETE' }),
 }

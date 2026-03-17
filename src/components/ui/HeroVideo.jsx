@@ -1,24 +1,24 @@
-import { useState, useEffect, useRef, useCallback, useContext } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight, Phone, Calendar, Play } from 'lucide-react'
-import Button from './Button'
-import PulsingCTA from './PulsingCTA'
-import { HeroVideoContext } from '../../contexts/HeroVideoContext'
+import { useState, useEffect, useRef, useCallback, useContext } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Phone, Calendar, Play } from "lucide-react";
+import Button from "./Button";
+import PulsingCTA from "./PulsingCTA";
+import { HeroVideoContext } from "../../contexts/HeroVideoContext";
 
 // Lightweight shimmer loader shown before video is ready
 function HeroLoader({ isVisible }) {
   return (
     <div
       className={`absolute inset-0 z-10 transition-opacity duration-700 ${
-        isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
       {/* Blurred poster background */}
       <div
         className="absolute inset-0 bg-cover bg-center scale-105"
         style={{
-          backgroundImage: 'url(/hero.png)',
-          filter: 'blur(8px) brightness(0.6)',
+          backgroundImage: "url(/hero.png)",
+          filter: "blur(8px) brightness(0.6)",
         }}
       />
       {/* Shimmer overlay */}
@@ -30,101 +30,101 @@ function HeroLoader({ isVisible }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function HeroVideo({ onVideoReady }) {
-  const { heroVideoLoaded, markVideoLoaded } = useContext(HeroVideoContext)
-  const [videoError, setVideoError] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  const { heroVideoLoaded, markVideoLoaded } = useContext(HeroVideoContext);
+  const [videoError, setVideoError] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
-  const [contentVisible, setContentVisible] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [contentVisible, setContentVisible] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
-  const videoRef = useRef(null)
-  const heroRef = useRef(null)
-  const retryCountRef = useRef(0)
+  const videoRef = useRef(null);
+  const heroRef = useRef(null);
+  const retryCountRef = useRef(0);
 
   // Subscribe to resize and reduced motion changes
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', checkMobile)
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", checkMobile);
 
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const handleMotionChange = (e) => setPrefersReducedMotion(e.matches)
-    motionQuery.addEventListener('change', handleMotionChange)
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleMotionChange = (e) => setPrefersReducedMotion(e.matches);
+    motionQuery.addEventListener("change", handleMotionChange);
 
     return () => {
-      window.removeEventListener('resize', checkMobile)
-      motionQuery.removeEventListener('change', handleMotionChange)
-    }
-  }, [])
+      window.removeEventListener("resize", checkMobile);
+      motionQuery.removeEventListener("change", handleMotionChange);
+    };
+  }, []);
 
   // Parallax scroll effect
   useEffect(() => {
-    if (prefersReducedMotion) return
+    if (prefersReducedMotion) return;
 
-    let ticking = false
+    let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          setScrollY(window.scrollY)
-          ticking = false
-        })
-        ticking = true
+          setScrollY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
       }
-    }
+    };
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [prefersReducedMotion])
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [prefersReducedMotion]);
 
   // Trigger content entrance animation
   useEffect(() => {
-    const timer = setTimeout(() => setContentVisible(true), 200)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setContentVisible(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleVideoReady = useCallback(() => {
-    markVideoLoaded()
-    retryCountRef.current = 0
-    onVideoReady?.()
-  }, [markVideoLoaded, onVideoReady])
+    markVideoLoaded();
+    retryCountRef.current = 0;
+    onVideoReady?.();
+  }, [markVideoLoaded, onVideoReady]);
 
   const handleVideoError = useCallback(() => {
     // Retry up to 2 times before showing fallback
     if (retryCountRef.current < 2) {
-      retryCountRef.current += 1
+      retryCountRef.current += 1;
       // Retry by resetting and reloading the video
       if (videoRef.current) {
-        videoRef.current.load()
+        videoRef.current.load();
       }
     } else {
       // After 2 retries, accept the error
-      setVideoError(true)
-      onVideoReady?.()
+      setVideoError(true);
+      onVideoReady?.();
     }
-  }, [onVideoReady])
+  }, [onVideoReady]);
 
-  const shouldShowVideo = !prefersReducedMotion && !videoError
+  const shouldShowVideo = !prefersReducedMotion && !videoError;
 
   // Signal ready immediately when video won't be shown
   useEffect(() => {
     if (!shouldShowVideo && !heroVideoLoaded) {
-      markVideoLoaded()
-      onVideoReady?.()
+      markVideoLoaded();
+      onVideoReady?.();
     }
-  }, [shouldShowVideo, heroVideoLoaded, markVideoLoaded, onVideoReady])
-  const showLoader = !heroVideoLoaded && shouldShowVideo
-  const parallaxOffset = (prefersReducedMotion || isMobile) ? 0 : scrollY * 0.3
+  }, [shouldShowVideo, heroVideoLoaded, markVideoLoaded, onVideoReady]);
+  const showLoader = !heroVideoLoaded && shouldShowVideo;
+  const parallaxOffset = prefersReducedMotion || isMobile ? 0 : scrollY * 0.3;
 
   return (
     <section
       ref={heroRef}
       className="hero-video-section relative overflow-hidden flex items-center"
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: "100vh" }}
     >
       {/* ── Video / Fallback Background ── */}
       {shouldShowVideo ? (
@@ -132,13 +132,13 @@ export default function HeroVideo({ onVideoReady }) {
           className="absolute inset-0 z-0"
           style={{
             transform: `translateY(${parallaxOffset}px)`,
-            willChange: 'transform',
+            willChange: "transform",
           }}
         >
           <video
             ref={videoRef}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-              heroVideoLoaded ? 'opacity-100' : 'opacity-0'
+              heroVideoLoaded ? "opacity-100" : "opacity-0"
             }`}
             autoPlay
             muted
@@ -159,9 +159,9 @@ export default function HeroVideo({ onVideoReady }) {
         <div
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(/hero.png)',
-            transform: isMobile ? 'none' : `translateY(${parallaxOffset}px)`,
-            willChange: isMobile ? 'auto' : 'transform',
+            backgroundImage: "url(/hero.png)",
+            transform: isMobile ? "none" : `translateY(${parallaxOffset}px)`,
+            willChange: isMobile ? "auto" : "transform",
           }}
         />
       )}
@@ -176,19 +176,20 @@ export default function HeroVideo({ onVideoReady }) {
       <div
         className="relative z-[2] max-w-7xl mx-auto px-6 lg:px-8 w-full"
         style={{
-          paddingTop: '120px',
-          paddingBottom: '100px',
-          transform: (prefersReducedMotion || isMobile)
-            ? 'none'
-            : `translateY(${scrollY * 0.1}px)`,
-          willChange: (prefersReducedMotion || isMobile) ? 'auto' : 'transform',
+          paddingTop: "120px",
+          paddingBottom: "100px",
+          transform:
+            prefersReducedMotion || isMobile
+              ? "none"
+              : `translateY(${scrollY * 0.1}px)`,
+          willChange: prefersReducedMotion || isMobile ? "auto" : "transform",
         }}
       >
         <div className="max-w-2xl mx-auto text-center">
           {/* Badge */}
           <div
-            className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
-            style={{ transitionDelay: '0.1s' }}
+            className={`hero-content-enter ${contentVisible ? "hero-content-visible" : ""}`}
+            style={{ transitionDelay: "0.1s" }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium text-white/90 mb-8">
               <span className="relative flex h-2.5 w-2.5">
@@ -201,22 +202,23 @@ export default function HeroVideo({ onVideoReady }) {
 
           {/* Heading - Premium Crystal Style */}
           <div
-            className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
-            style={{ transitionDelay: '0.25s' }}
+            className={`hero-content-enter ${contentVisible ? "hero-content-visible" : ""}`}
+            style={{ transitionDelay: "0.25s" }}
           >
             {/* Doctor Name - Crystal Premium */}
             <div className="relative mb-8">
               {/* Outer glow effect */}
               <div className="absolute -inset-6 bg-gradient-to-r from-cyan-500/20 via-white/10 to-violet-500/20 rounded-2xl blur-2xl" />
-              
+
               {/* Inner subtle glow */}
               <div className="absolute -inset-3 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-xl" />
-              
+
               <h1
                 className="relative text-white font-bold leading-[1.1]"
-                style={{ 
-                  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-                  textShadow: '0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1)',
+                style={{
+                  fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                  textShadow:
+                    "0 0 40px rgba(255,255,255,0.3), 0 0 80px rgba(255,255,255,0.1)",
                 }}
               >
                 {/* Main name with subtle inner shine */}
@@ -225,13 +227,13 @@ export default function HeroVideo({ onVideoReady }) {
                     Dr. Abir Bouthouri
                   </span>
                 </span>
-                
+
                 {/* Title with elegant gradient */}
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-indigo-200 to-violet-200 mt-4 text-2xl md:text-3xl font-semibold">
                   Neurologue
                 </span>
               </h1>
-              
+
               {/* Elegant accent line */}
               <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-px bg-gradient-to-r from-transparent via-amber-300/80 to-transparent" />
             </div>
@@ -239,19 +241,21 @@ export default function HeroVideo({ onVideoReady }) {
 
           {/* Tagline */}
           <div
-            className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
-            style={{ transitionDelay: '0.4s' }}
+            className={`hero-content-enter ${contentVisible ? "hero-content-visible" : ""}`}
+            style={{ transitionDelay: "0.4s" }}
           >
             <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg mx-auto leading-relaxed">
-              Plus de 15 ans d'expérience en neurologie. Membre de l'Académie
-              Américaine de Neurologie. Des soins modernes et personnalisés.
+              Plus de 10 ans d’expérience en Neurologie. Une expertise à
+              l’échelle nationale et internationale. Une prise en charge moderne
+              et un suivi continu. Parce qu’ici, chaque patient est unique et au
+              cœur de notre engagement.
             </p>
           </div>
 
           {/* CTA Buttons */}
           <div
-            className={`hero-content-enter ${contentVisible ? 'hero-content-visible' : ''}`}
-            style={{ transitionDelay: '0.55s' }}
+            className={`hero-content-enter ${contentVisible ? "hero-content-visible" : ""}`}
+            style={{ transitionDelay: "0.55s" }}
           >
             <div className="flex flex-wrap gap-4 justify-center">
               <PulsingCTA delay={5000} interval={5000}>
@@ -291,5 +295,5 @@ export default function HeroVideo({ onVideoReady }) {
       {/* ── Bottom fade transition to next section ── */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-[2]" />
     </section>
-  )
+  );
 }

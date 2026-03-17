@@ -1,12 +1,25 @@
 import { useState, useEffect } from 'react'
-import { Search, Check, X } from 'lucide-react'
+import { Search, Check, X, Plus, Calendar, Trash2 } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Avatar from '../../components/ui/Avatar'
 import Button from '../../components/ui/Button'
+import Modal from '../../components/ui/Modal'
+import Input from '../../components/ui/Input'
 import { appointmentsApi } from '../../services/api'
 
 const filters = ['All', 'pending', 'confirmed', 'completed', 'cancelled']
+
+const services = [
+  'Consultation neurologique',
+  'Suivi neurologique',
+  'Électromyographie (EMG)',
+  'Électroencéphalographie (EEG)',
+  'Échographie Doppler',
+  'IRM',
+  'Scanner cérébral',
+  'Autre'
+]
 
 function formatTime(time) {
   if (!time) return ''
@@ -22,10 +35,29 @@ export default function Appointments() {
   const [search, setSearch] = useState('')
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [editingAppointment, setEditingAppointment] = useState(null)
+  const [formData, setFormData] = useState({
+    patientName: '',
+    patientPhone: '',
+    patientEmail: '',
+    service: '',
+    date: '',
+    time: '',
+    notes: ''
+  })
+  const [saving, setSaving] = useState(false)
+  const [availableSlots, setAvailableSlots] = useState([])
 
   useEffect(() => {
     loadAppointments()
   }, [])
+
+  useEffect(() => {
+    if (formData.date) {
+      loadAvailableSlots(formData.date)
+    }
+  }, [formData.date])
 
   const loadAppointments = async () => {
     try {
@@ -38,11 +70,21 @@ export default function Appointments() {
     }
   }
 
+  const loadAvailableSlots = async (date) => {
+    try {
+      const data = await appointmentsApi.getAvailableSlots(date)
+      setAvailableSlots(data.slots)
+    } catch (error) {
+      console.error('Error loading slots:', error)
+    }
+  }
+
   const filtered = appointments.filter((a) => {
     const matchFilter = activeFilter === 'All' || a.status === activeFilter
     const matchSearch =
       a.patient_name?.toLowerCase().includes(search.toLowerCase()) ||
-      a.service?.toLowerCase().includes(search.toLowerCase())
+      a.service?.toLowerCase().includes(search.toLowerCase()) ||
+      a.patient_phone?.includes(search)
     return matchFilter && matchSearch
   })
 
@@ -57,6 +99,77 @@ export default function Appointments() {
     }
   }
 
+  const deleteAppointment = async (id) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous?')) return
+    try {
+      await appointmentsApi.delete(id)
+      setAppointments((prev) => prev.filter((a) => a.id !== id))
+    } catch (error) {
+      console.error('Error deleting appointment:', error)
+    }
+  }
+
+  const openCreateModal = () => {
+    setEditingAppointment(null)
+    setFormData({
+      patientName: '',
+      patientPhone: '',
+      patientEmail: '',
+      service: '',
+      date: '',
+      time: '',
+      notes: ''
+    })
+    setShowModal(true)
+  }
+
+  const openEditModal = (apt) => {
+    setEditingAppointment(apt)
+    setFormData({
+      patientName: apt.patient_name || '',
+      patientPhone: apt.patient_phone || '',
+      patientEmail: apt.patient_email || '',
+      service: apt.service || '',
+      date: apt.appointment_date || '',
+      time: apt.appointment_time ? formatTime(apt.appointment_time) : '',
+      notes: apt.notes || ''
+    })
+    setShowModal(true)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    
+    try {
+      if (editingAppointment) {
+        await appointmentsApi.update(editingAppointment.id, {
+          patientName: formData.patientName,
+          patientPhone: formData.patientPhone,
+          patientEmail: formData.patientEmail,
+          service: formData.service,
+          date: formData.date,
+          time: formData.time,
+          notes: formData.notes
+        })
+      } else {
+        await appointmentsApi.create(formData)
+      }
+      await loadAppointments()
+      setShowModal(false)
+    } catch (error) {
+      console.error('Error saving appointment:', error)
+      alert(error.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const getTodayDate = () => {
+    const today = new Date()
+    return today.toISOString().split('T')[0]
+  }
+
   return (
     <div className="space-y-4 lg:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -64,6 +177,9 @@ export default function Appointments() {
           <h1 className="text-xl lg:text-2xl font-semibold text-slate-900">Rendez-vous</h1>
           <p className="text-slate-500 text-sm mt-0.5">Gérer les rendez-vous des patients</p>
         </div>
+        <Button variant="primary" icon={Plus} onClick={openCreateModal}>
+          Nouveau RDV
+        </Button>
       </div>
 
       {/* Filters and Search */}
@@ -72,7 +188,7 @@ export default function Appointments() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Rechercher par patient ou motif..."
+            placeholder="Rechercher par patient, service ou téléphone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
@@ -108,7 +224,7 @@ export default function Appointments() {
                     <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Patient</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Date</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Heure</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Motif</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Service</th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Statut</th>
                     <th className="text-right px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -126,7 +242,7 @@ export default function Appointments() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
-                        {new Date(apt.appointment_date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(apt.appointment_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-slate-800">{formatTime(apt.appointment_time)}</td>
                       <td className="px-6 py-4 text-sm text-slate-500 max-w-[200px] truncate">{apt.service}</td>
@@ -137,34 +253,25 @@ export default function Appointments() {
                         <div className="flex items-center justify-end gap-1">
                           {apt.status === 'pending' && (
                             <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => updateStatus(apt.id, 'confirmed')}
-                                className="text-emerald-600 hover:bg-emerald-50"
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => updateStatus(apt.id, 'confirmed')} className="text-emerald-600 hover:bg-emerald-50">
                                 <Check className="w-4 h-4" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => updateStatus(apt.id, 'cancelled')}
-                                className="text-red-500 hover:bg-red-50"
-                              >
+                              <Button variant="ghost" size="sm" onClick={() => updateStatus(apt.id, 'cancelled')} className="text-red-500 hover:bg-red-50">
                                 <X className="w-4 h-4" />
                               </Button>
                             </>
                           )}
                           {apt.status === 'confirmed' && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => updateStatus(apt.id, 'completed')}
-                              className="text-indigo-600 hover:bg-indigo-50"
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => updateStatus(apt.id, 'completed')} className="text-indigo-600 hover:bg-indigo-50">
                               <Check className="w-4 h-4" /> Terminé
                             </Button>
                           )}
+                          <Button variant="ghost" size="sm" onClick={() => openEditModal(apt)} className="text-slate-400 hover:text-slate-600">
+                            ✏️
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => deleteAppointment(apt.id)} className="text-red-400 hover:text-red-600">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -196,7 +303,10 @@ export default function Appointments() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-4 text-slate-600">
-                    <span>{new Date(apt.appointment_date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' })}</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {new Date(apt.appointment_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                    </span>
                     <span className="font-medium text-slate-800">{formatTime(apt.appointment_time)}</span>
                   </div>
                 </div>
@@ -204,31 +314,16 @@ export default function Appointments() {
                 <div className="flex gap-2 pt-2 border-t border-slate-100">
                   {apt.status === 'pending' && (
                     <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => updateStatus(apt.id, 'confirmed')}
-                        className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                      >
+                      <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'confirmed')} className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50">
                         <Check className="w-4 h-4 mr-1" /> Confirmer
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => updateStatus(apt.id, 'cancelled')}
-                        className="flex-1 text-red-500 border-red-200 hover:bg-red-50"
-                      >
+                      <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'cancelled')} className="flex-1 text-red-500 border-red-200 hover:bg-red-50">
                         <X className="w-4 h-4 mr-1" /> Annuler
                       </Button>
                     </>
                   )}
                   {apt.status === 'confirmed' && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateStatus(apt.id, 'completed')}
-                      className="flex-1 text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                    >
+                    <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'completed')} className="flex-1 text-indigo-600 border-indigo-200 hover:bg-indigo-50">
                       <Check className="w-4 h-4 mr-1" /> Terminer
                     </Button>
                   )}
@@ -249,6 +344,118 @@ export default function Appointments() {
           </div>
         </>
       )}
+
+      {/* Create/Edit Modal */}
+      <Modal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+        title={editingAppointment ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous'}
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Nom du patient"
+              value={formData.patientName}
+              onChange={(e) => setFormData({...formData, patientName: e.target.value})}
+              placeholder="Nom complet"
+              required
+            />
+            <Input
+              label="Téléphone"
+              value={formData.patientPhone}
+              onChange={(e) => setFormData({...formData, patientPhone: e.target.value})}
+              placeholder="XX XXX XXX"
+              required
+            />
+          </div>
+          
+          <Input
+            label="Email (optionnel)"
+            type="email"
+            value={formData.patientEmail}
+            onChange={(e) => setFormData({...formData, patientEmail: e.target.value})}
+            placeholder="email@exemple.com"
+          />
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Service</label>
+            <select
+              value={formData.service}
+              onChange={(e) => setFormData({...formData, service: e.target.value})}
+              className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+              required
+            >
+              <option value="">Sélectionner un service</option>
+              {services.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Date"
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({...formData, date: e.target.value})}
+              min={getTodayDate()}
+              required
+            />
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Heure</label>
+              <select
+                value={formData.time}
+                onChange={(e) => setFormData({...formData, time: e.target.value})}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+                required
+              >
+                <option value="">Sélectionner</option>
+                {availableSlots.length > 0 ? availableSlots.map(slot => (
+                  <option key={slot} value={slot}>{slot}</option>
+                )) : (
+                  <>
+                    <option value="08:30">08:30</option>
+                    <option value="09:00">09:00</option>
+                    <option value="09:30">09:30</option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option>
+                  </>
+                )}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Notes (optionnel)</label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({...formData, notes: e.target.value})}
+              placeholder="Observations..."
+              rows={3}
+              className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 resize-none"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="secondary" onClick={() => setShowModal(false)} className="flex-1">
+              Annuler
+            </Button>
+            <Button type="submit" variant="primary" disabled={saving} className="flex-1">
+              {saving ? 'Enregistrement...' : editingAppointment ? 'Mettre à jour' : 'Créer le RDV'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

@@ -192,7 +192,7 @@ export default function Services() {
               <div className="flex flex-wrap justify-center gap-6 md:gap-8 mt-10 pt-8 border-t border-white/10">
                 <AnimatedStat
                   end={13}
-                  suffix="+"
+                  suffix=""
                   label="Années exp"
                   delay={400}
                 />

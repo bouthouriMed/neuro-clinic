@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   Calendar,
   Clock,
@@ -13,16 +14,21 @@ import {
   CalendarCheck,
   MapPin,
   Bell,
+  UserPlus,
 } from 'lucide-react'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import { Textarea } from '../../components/ui/Input'
 import { timeSlots, doctor } from '../../data/mockData'
+import { appointmentsApi, authApi } from '../../services/api'
 
 const steps = ['Date & Heure', 'Vos Informations', 'Confirmé']
 
 export default function BookAppointment() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [step, setStep] = useState(0)
+  const [oauthUser, setOauthUser] = useState(null)
+  const [createAccount, setCreateAccount] = useState(false)
   const [form, setForm] = useState({
     date: '',
     time: '',
@@ -37,6 +43,47 @@ export default function BookAppointment() {
   const continueButtonRef = useRef(null)
   const step2Ref = useRef(null)
   const step3Ref = useRef(null)
+
+  // Handle OAuth callback
+  useEffect(() => {
+    const oauth = searchParams.get('oauth')
+    if (oauth === 'success') {
+      const email = searchParams.get('email')
+      const firstName = searchParams.get('firstName')
+      const lastName = searchParams.get('lastName')
+      const userId = searchParams.get('userId')
+      const provider = searchParams.get('provider')
+      
+      // Restore booking data from localStorage
+      const savedBooking = localStorage.getItem('neuroclinic_booking')
+      let savedDate = ''
+      let savedTime = ''
+      
+      if (savedBooking) {
+        const booking = JSON.parse(savedBooking)
+        savedDate = booking.date || ''
+        savedTime = booking.time || ''
+        localStorage.removeItem('neuroclinic_booking')
+      }
+      
+      if (email) {
+        setOauthUser({ email, firstName, lastName, id: userId, provider })
+        setForm(prev => ({
+          ...prev,
+          email: email,
+          name: firstName && lastName ? `${firstName} ${lastName}` : firstName || '',
+          date: savedDate || prev.date,
+          time: savedTime || prev.time,
+        }))
+        setCreateAccount(true)
+        // Go to step 1 (user info) with filled data
+        setStep(1)
+      }
+      
+      // Clear URL params
+      setSearchParams({})
+    }
+  }, [searchParams, setSearchParams])
 
   const update = (field, value) => {
     setForm((f) => ({ ...f, [field]: value }))
@@ -85,7 +132,18 @@ export default function BookAppointment() {
   const dates = generateDates()
 
   const handleOAuth = (provider) => {
-    console.log(`${provider} login clicked - OAuth coming soon`)
+    // Save booking data before redirect
+    localStorage.setItem('neuroclinic_booking', JSON.stringify({
+      date: form.date,
+      time: form.time,
+      step: 1
+    }))
+    
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+    const redirectUrl = provider === 'google' 
+      ? `${baseUrl}/api/auth/google`
+      : `${baseUrl}/api/auth/facebook`
+    window.location.href = redirectUrl
   }
 
   const handleContinue = () => {
@@ -99,22 +157,63 @@ export default function BookAppointment() {
     }, 200)
   }
 
-  const handleSubmit = () => {
-    setSuccess({
-      id: Date.now(),
-      date: form.date,
-      time: form.time,
-      service: 'Consultation Neurologique',
-      patientName: form.name
-    })
-    setStep(2)
-    setTimeout(() => {
-      const element = step3Ref.current
-      if (element) {
-        const offset = element.getBoundingClientRect().top - 180
-        window.scrollTo({ top: window.scrollY + offset, behavior: 'smooth' })
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      // Try to create/update user first (lead or patient)
+      let userId = oauthUser?.id
+      let firstName = ''
+      let lastName = ''
+      
+      // Parse name
+      const nameParts = form.name.trim().split(' ')
+      firstName = nameParts[0] || ''
+      lastName = nameParts.slice(1).join(' ') || ''
+      
+      // Upsert user (create lead or upgrade to patient if createAccount is true)
+      const userResult = await authApi.upsertFromBooking({
+        email: form.email,
+        firstName,
+        lastName,
+        phone: form.phone,
+        createAccount,
+        provider: oauthUser ? oauthUser.provider || 'google' : 'local'
+      })
+      
+      if (userResult.userId) {
+        userId = userResult.userId
       }
-    }, 200)
+      
+      // Create appointment with linked user
+      const result = await appointmentsApi.create({
+        patientName: form.name,
+        patientPhone: form.phone,
+        patientEmail: form.email,
+        service: 'Consultation neurologique',
+        date: form.date,
+        time: form.time,
+        notes: form.reason,
+        userId
+      })
+      
+      setSuccess({
+        id: result.appointment?.id || Date.now(),
+        date: form.date,
+        time: form.time,
+        service: 'Consultation neurologique',
+        patientName: form.name,
+        createAccount,
+        email: form.email
+      })
+      setStep(2)
+    } catch (error) {
+      console.error('Error creating appointment:', error)
+      alert('Erreur lors de la création du rendez-vous. Veuillez réessayer.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleReset = () => {
@@ -317,6 +416,41 @@ export default function BookAppointment() {
                 <div className="mt-4">
                   <Textarea label="Motif de la consultation" placeholder="Symptômes, motif de visite..." value={form.reason} onChange={(e) => update('reason', e.target.value)} />
                 </div>
+
+                {/* Create Account Option */}
+                {!oauthUser && (
+                  <div className="mt-4 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={createAccount}
+                        onChange={(e) => setCreateAccount(e.target.checked)}
+                        className="mt-1 w-5 h-5 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <div>
+                        <div className="flex items-center gap-2 text-sm font-medium text-indigo-900">
+                          <UserPlus className="w-4 h-4" />
+                          Créer un compte patient
+                        </div>
+                        <p className="text-xs text-indigo-700 mt-1">
+                          Gérez vos rendez-vous en ligne et recevez des notifications
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                )}
+
+                {oauthUser && (
+                  <div className="mt-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div className="flex items-center gap-2 text-sm font-medium text-emerald-800">
+                      <CheckCircle className="w-4 h-4" />
+                      Connecté via {oauthUser.provider || 'Google'}
+                    </div>
+                    <p className="text-xs text-emerald-700 mt-1">
+                      Veuillez compléter votre numéro de téléphone ci-dessous
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 flex items-start gap-3">
@@ -328,8 +462,8 @@ export default function BookAppointment() {
                 <Button variant="secondary" onClick={() => setStep(0)} className="px-5">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Retour
                 </Button>
-                <Button onClick={handleSubmit} disabled={!form.name || !form.phone || !form.email} size="lg" variant="primary" className="px-8">
-                  Confirmer <CheckCircle className="w-5 h-5 ml-2" />
+                <Button onClick={handleSubmit} disabled={!form.name || !form.phone || !form.email || loading} size="lg" variant="primary" className="px-8">
+                  {loading ? 'Enregistrement...' : 'Confirmer'} <CheckCircle className="w-5 h-5 ml-2" />
                 </Button>
               </div>
             </div>
@@ -343,6 +477,18 @@ export default function BookAppointment() {
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-2">Rendez-vous confirmé !</h3>
               <p className="text-slate-500 mb-6">Confirmation envoyée par email et SMS</p>
+
+              {success.createAccount && (
+                <div className="bg-indigo-50 rounded-2xl p-4 border border-indigo-100 mb-6 max-w-sm mx-auto">
+                  <div className="flex items-center gap-2 text-indigo-800 font-medium mb-1">
+                    <UserPlus className="w-4 h-4" />
+                    Compte patient créé !
+                  </div>
+                  <p className="text-sm text-indigo-700">
+                    Connectez-vous pour gérer vos rendez-vous
+                  </p>
+                </div>
+              )}
 
               <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 max-w-sm mx-auto text-left mb-6">
                 <div className="flex items-center gap-3 pb-4 mb-4 border-b border-slate-100">
@@ -375,24 +521,30 @@ export default function BookAppointment() {
                 </a>
               </div>
 
-              {/* OAuth instead of "Book Another" */}
-              <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 max-w-sm mx-auto">
-                <p className="text-sm text-slate-600 mb-4">Créer un compte pour gérer vos rdvs</p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  <button onClick={() => handleOAuth('google')} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 font-medium text-xs sm:text-sm text-slate-700 shadow-sm">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                    <span className="hidden sm:inline">Google</span>
-                  </button>
-                  <button onClick={() => handleOAuth('facebook')} className="flex items-center gap-1.5 px-3 py-2 bg-[#1877F2] rounded-lg font-medium text-xs sm:text-sm text-white shadow-sm">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    <span className="hidden sm:inline">Facebook</span>
-                  </button>
-                  <button onClick={() => handleOAuth('instagram')} className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] rounded-lg font-medium text-xs sm:text-sm text-white shadow-sm">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    <span className="hidden sm:inline">Instagram</span>
-                  </button>
+              {/* Post-booking options */}
+              {!success.createAccount && (
+                <div className="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 max-w-sm mx-auto">
+                  <p className="text-sm text-slate-600 mb-4">Créer un compte pour gérer vos rdvs</p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button onClick={() => handleOAuth('google')} className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 font-medium text-xs sm:text-sm text-slate-700 shadow-sm">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      <span className="hidden sm:inline">Google</span>
+                    </button>
+                    <button onClick={() => handleOAuth('facebook')} className="flex items-center gap-1.5 px-3 py-2 bg-[#1877F2] rounded-lg font-medium text-xs sm:text-sm text-white shadow-sm">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      <span className="hidden sm:inline">Facebook</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {success.createAccount && (
+                <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 max-w-sm mx-auto">
+                  <p className="text-sm text-emerald-700">
+                    Un email avec vos identifiants de connexion vous sera envoyé.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
