@@ -9,8 +9,6 @@ import {
   ChevronLeft,
   X,
 } from 'lucide-react'
-import { notifications } from '../../data/mockData'
-
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Tableau de bord', exact: true },
   { to: '/dashboard/appointments', icon: Calendar, label: 'Rendez-vous' },
@@ -19,10 +17,9 @@ const navItems = [
   { to: '/dashboard/notifications', icon: Bell, label: 'Notifications' },
 ]
 
-export default function DashboardSidebar({ collapsed, mobileOpen, onToggle, onMobileClose }) {
+export default function DashboardSidebar({ collapsed, mobileOpen, onToggle, onMobileClose, unreadCount = 0 }) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const unreadCount = notifications.filter((n) => !n.read).length
 
   const isActive = (item) =>
     item.exact ? pathname === item.to : pathname.startsWith(item.to)

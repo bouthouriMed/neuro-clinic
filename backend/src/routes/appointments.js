@@ -69,7 +69,16 @@ router.post('/', async (req, res) => {
     )
     
     const appointment = result.rows[0]
-    res.status(201).json({ 
+
+    // Create notification for new appointment
+    const dateStr = new Date(appointment.appointment_date).toLocaleDateString('fr-FR')
+    const timeStr = appointment.appointment_time.slice(0, 5)
+    await query(
+      `INSERT INTO notifications (type, message) VALUES ($1, $2)`,
+      ['appointment', `Nouveau rendez-vous de ${appointment.patient_name} le ${dateStr} à ${timeStr} - ${appointment.service}`]
+    )
+
+    res.status(201).json({
       message: 'Appointment created successfully',
       appointment: {
         id: appointment.id,
@@ -92,9 +101,21 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const { status } = req.body
-    
+
+    const existing = await query('SELECT patient_name FROM appointments WHERE id = $1', [id])
     await query('UPDATE appointments SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [status, id])
-    
+
+    if (existing.rows.length > 0) {
+      const statusLabels = { confirmed: 'confirmé', completed: 'terminé', cancelled: 'annulé' }
+      const label = statusLabels[status]
+      if (label) {
+        await query(
+          `INSERT INTO notifications (type, message) VALUES ($1, $2)`,
+          ['appointment', `Rendez-vous de ${existing.rows[0].patient_name} ${label}`]
+        )
+      }
+    }
+
     res.json({ message: 'Appointment updated successfully' })
   } catch (error) {
     console.error('Error updating appointment:', error)

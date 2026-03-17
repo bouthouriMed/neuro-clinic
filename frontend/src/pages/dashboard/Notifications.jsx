@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Bell, Calendar, AlertCircle, Check } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import { notifications as initialNotifications } from '../../data/mockData'
+import { notificationsApi } from '../../services/api'
 
 const iconMap = {
   appointment: Calendar,
@@ -11,17 +11,44 @@ const iconMap = {
 }
 
 export default function Notifications() {
-  const [notifs, setNotifs] = useState(initialNotifications)
+  const [notifs, setNotifs] = useState([])
 
-  const markAllRead = () => {
-    setNotifs((prev) => prev.map((n) => ({ ...n, read: true })))
+  useEffect(() => {
+    notificationsApi.getAll().then(setNotifs).catch(console.error)
+  }, [])
+
+  const markAllRead = async () => {
+    try {
+      await notificationsApi.markAllRead()
+      setNotifs((prev) => prev.map((n) => ({ ...n, read: true })))
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const markRead = (id) => {
-    setNotifs((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
+  const markRead = async (id) => {
+    try {
+      await notificationsApi.markRead(id)
+      setNotifs((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const unreadCount = notifs.filter((n) => !n.read).length
+
+  const timeAgo = (dateStr) => {
+    const now = new Date()
+    const date = new Date(dateStr)
+    const diffMs = now - date
+    const diffMin = Math.floor(diffMs / 60000)
+    if (diffMin < 1) return "À l'instant"
+    if (diffMin < 60) return `${diffMin} min`
+    const diffHours = Math.floor(diffMin / 60)
+    if (diffHours < 24) return `${diffHours} heure${diffHours > 1 ? 's' : ''}`
+    const diffDays = Math.floor(diffHours / 24)
+    return `${diffDays} jour${diffDays > 1 ? 's' : ''}`
+  }
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -41,12 +68,17 @@ export default function Notifications() {
 
       <Card>
         <div className="divide-y divide-slate-100">
+          {notifs.length === 0 && (
+            <div className="px-6 py-12 text-center text-slate-400 text-sm">
+              Aucune notification
+            </div>
+          )}
           {notifs.map((notif) => {
             const Icon = iconMap[notif.type] || Bell
             return (
               <div
                 key={notif.id}
-                onClick={() => markRead(notif.id)}
+                onClick={() => !notif.read && markRead(notif.id)}
                 className={`px-4 lg:px-6 py-4 flex items-start gap-3 lg:gap-4 hover:bg-slate-50/50 transition-colors cursor-pointer ${
                   !notif.read ? 'bg-indigo-50/30' : ''
                 }`}
@@ -66,7 +98,7 @@ export default function Notifications() {
                   <p className={`text-sm leading-relaxed ${!notif.read ? 'text-slate-800 font-medium' : 'text-slate-600'}`}>
                     {notif.message}
                   </p>
-                  <span className="text-xs text-slate-400 mt-1 block">{notif.time}</span>
+                  <span className="text-xs text-slate-400 mt-1 block">{timeAgo(notif.created_at)}</span>
                 </div>
                 {!notif.read && (
                   <span className="w-2 h-2 rounded-full bg-indigo-500 mt-2 shrink-0" />

@@ -1,19 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Card from '../../components/ui/Card'
-import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
-import { appointments, timeSlots } from '../../data/mockData'
+import { appointmentsApi } from '../../services/api'
 
 const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 
+const timeSlots = [
+  '08:30', '09:00', '09:30', '10:00', '10:30', '11:00',
+  '11:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
+]
+
 export default function CalendarView() {
   const [weekOffset, setWeekOffset] = useState(0)
+  const [appointments, setAppointments] = useState([])
+
+  useEffect(() => {
+    appointmentsApi.getAll().then(setAppointments).catch(console.error)
+  }, [])
 
   const getWeekDates = () => {
-    const today = new Date(2026, 2, 14)
+    const today = new Date()
     const monday = new Date(today)
-    monday.setDate(today.getDate() - today.getDay() + 1 + weekOffset * 7)
+    monday.setDate(today.getDate() - ((today.getDay() + 6) % 7) + weekOffset * 7)
 
     return weekDays.map((day, i) => {
       const date = new Date(monday)
@@ -23,7 +32,7 @@ export default function CalendarView() {
         date: date.getDate(),
         month: date.toLocaleDateString('fr', { month: 'short' }),
         full: date.toISOString().split('T')[0],
-        isToday: date.toISOString().split('T')[0] === '2026-03-14',
+        isToday: date.toISOString().split('T')[0] === new Date().toISOString().split('T')[0],
       }
     })
   }
@@ -31,7 +40,11 @@ export default function CalendarView() {
   const week = getWeekDates()
 
   const getAppointmentsForSlot = (date, time) =>
-    appointments.filter((a) => a.date === date && a.time === time)
+    appointments.filter((a) => {
+      const aptDate = a.appointment_date ? a.appointment_date.split('T')[0] : ''
+      const aptTime = a.appointment_time ? a.appointment_time.slice(0, 5) : ''
+      return aptDate === date && aptTime === time && a.status !== 'cancelled'
+    })
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -105,7 +118,7 @@ export default function CalendarView() {
                               : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
                           }`}
                         >
-                          <div className="font-medium truncate">{apt.patientName}</div>
+                          <div className="font-medium truncate">{apt.patient_name}</div>
                         </div>
                       ))}
                     </div>

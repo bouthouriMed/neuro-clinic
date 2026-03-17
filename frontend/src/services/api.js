@@ -46,6 +46,12 @@ export const appointmentsApi = {
   delete: (id) => fetchApi(`/api/appointments/${id}`, { method: 'DELETE' }),
 }
 
+export const notificationsApi = {
+  getAll: () => fetchApi('/api/notifications'),
+  markRead: (id) => fetchApi(`/api/notifications/${id}/read`, { method: 'PUT' }),
+  markAllRead: () => fetchApi('/api/notifications/read-all', { method: 'PUT' }),
+}
+
 export const usersApi = {
   getAll: () => fetchApi('/api/users'),
   getById: (id) => fetchApi(`/api/users/${id}`),

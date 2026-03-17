@@ -78,6 +78,16 @@ export const initDatabase = async () => {
       CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status)
     `)
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        type VARCHAR(20) NOT NULL DEFAULT 'appointment',
+        message TEXT NOT NULL,
+        read BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+
     console.log('Database tables created successfully')
   } finally {
     client.release()
