@@ -17,7 +17,7 @@ function HeroLoader({ isVisible }) {
       <div
         className="absolute inset-0 bg-cover bg-center scale-105"
         style={{
-          backgroundImage: "url(/hero.png)",
+          backgroundImage: "url(/hero.webp)",
           filter: "blur(8px) brightness(0.6)",
         }}
       />
@@ -159,7 +159,7 @@ export default function HeroVideo({ onVideoReady }) {
         <div
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url(/hero.png)",
+            backgroundImage: "url(/hero.webp)",
             transform: isMobile ? "none" : `translateY(${parallaxOffset}px)`,
             willChange: isMobile ? "auto" : "transform",
           }}

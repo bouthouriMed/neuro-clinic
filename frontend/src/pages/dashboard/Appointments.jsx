@@ -489,6 +489,7 @@ export default function Appointments() {
               onChange={(e) => setFormData({...formData, patientName: e.target.value})}
               placeholder="Nom complet"
               required
+              disabled={!!editingAppointment}
             />
             <Input
               label="Téléphone"
@@ -496,6 +497,7 @@ export default function Appointments() {
               onChange={(e) => setFormData({...formData, patientPhone: e.target.value})}
               placeholder="XX XXX XXX"
               required
+              disabled={!!editingAppointment}
             />
           </div>
           
@@ -505,6 +507,7 @@ export default function Appointments() {
             value={formData.patientEmail}
             onChange={(e) => setFormData({...formData, patientEmail: e.target.value})}
             placeholder="email@exemple.com"
+            disabled={!!editingAppointment}
           />
 
           <div>
