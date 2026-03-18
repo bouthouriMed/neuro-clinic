@@ -1,8 +1,62 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Brain, Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react'
 import { doctor } from '../../data/mockData'
+import { scheduleApi } from '../../services/api'
+
+const DAY_LABELS = { 1: 'Lun', 2: 'Mar', 3: 'Mer', 4: 'Jeu', 5: 'Ven', 6: 'Sam' }
+
+function formatHoursFromSchedule(schedule) {
+  // Group days by their time ranges
+  const dayRanges = {}
+  for (let day = 1; day <= 6; day++) {
+    const slots = (schedule[day] || []).sort()
+    if (slots.length === 0) continue
+    const morning = slots.filter(s => s < '13:30')
+    const afternoon = slots.filter(s => s >= '13:30')
+    const parts = []
+    if (morning.length > 0) parts.push(`${morning[0].replace(':', 'h')} - ${morning[morning.length - 1].replace(':', 'h')}`)
+    if (afternoon.length > 0) parts.push(`${afternoon[0].replace(':', 'h')} - ${afternoon[afternoon.length - 1].replace(':', 'h')}`)
+    const range = parts.join(' & ')
+    dayRanges[day] = range
+  }
+
+  // Group consecutive days with same range
+  const lines = []
+  let i = 1
+  while (i <= 6) {
+    if (!dayRanges[i]) { i++; continue }
+    const range = dayRanges[i]
+    let j = i
+    while (j + 1 <= 6 && dayRanges[j + 1] === range) j++
+    const label = i === j ? DAY_LABELS[i] : `${DAY_LABELS[i]} - ${DAY_LABELS[j]}`
+    lines.push({ label, range })
+    i = j + 1
+  }
+
+  return lines
+}
 
 export default function PublicFooter() {
+  const [hours, setHours] = useState([
+    { label: 'Lun - Ven', range: '8h30 - 12h00 & 14h00 - 16h30' },
+    { label: 'Sam', range: '9h00 - 13h30' },
+  ])
+
+  useEffect(() => {
+    scheduleApi.getAll().then((rows) => {
+      const grouped = {}
+      rows.forEach((row) => {
+        const day = row.day_of_week
+        const time = row.time_slot.slice(0, 5)
+        if (!grouped[day]) grouped[day] = []
+        grouped[day].push(time)
+      })
+      const lines = formatHoursFromSchedule(grouped)
+      if (lines.length > 0) setHours(lines)
+    }).catch(console.error)
+  }, [])
+
   return (
     <footer className="bg-slate-900 text-slate-300 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -37,8 +91,9 @@ export default function PublicFooter() {
             <div className="flex items-start gap-2 mt-4 text-sm text-slate-500">
               <Clock className="w-4 h-4 text-teal-500 mt-0.5 shrink-0" />
               <div>
-                <div><span className="font-semibold text-slate-300">Lun - Ven:</span> 8h30 - 12h00 &amp; 14h00 - 16h30</div>
-                <div><span className="font-semibold text-slate-300">Sam:</span> 9h00 - 13h30</div>
+                {hours.map((h, i) => (
+                  <div key={i}><span className="font-semibold text-slate-300">{h.label}:</span> {h.range}</div>
+                ))}
               </div>
             </div>
           </div>

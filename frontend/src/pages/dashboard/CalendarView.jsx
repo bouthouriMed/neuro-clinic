@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -11,13 +12,23 @@ const timeSlots = [
   '11:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
 ]
 
+function toLocalDateStr(date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 export default function CalendarView() {
+  const navigate = useNavigate()
   const [weekOffset, setWeekOffset] = useState(0)
   const [appointments, setAppointments] = useState([])
 
   useEffect(() => {
     appointmentsApi.getAll().then(setAppointments).catch(console.error)
   }, [])
+
+  const todayStr = toLocalDateStr(new Date())
 
   const getWeekDates = () => {
     const today = new Date()
@@ -27,12 +38,13 @@ export default function CalendarView() {
     return weekDays.map((day, i) => {
       const date = new Date(monday)
       date.setDate(monday.getDate() + i)
+      const full = toLocalDateStr(date)
       return {
         day,
         date: date.getDate(),
         month: date.toLocaleDateString('fr', { month: 'short' }),
-        full: date.toISOString().split('T')[0],
-        isToday: date.toISOString().split('T')[0] === new Date().toISOString().split('T')[0],
+        full,
+        isToday: full === todayStr,
       }
     })
   }
@@ -110,12 +122,13 @@ export default function CalendarView() {
                       {slotAppointments.map((apt) => (
                         <div
                           key={apt.id}
-                          className={`px-2 py-1.5 rounded-lg text-xs mb-1 ${
+                          onClick={() => navigate(`/dashboard/appointments?search=${encodeURIComponent(apt.patient_name)}`)}
+                          className={`px-2 py-1.5 rounded-lg text-xs mb-1 cursor-pointer hover:shadow-sm transition-shadow ${
                             apt.status === 'confirmed'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
                               : apt.status === 'pending'
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                              : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                              : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100'
                           }`}
                         >
                           <div className="font-medium truncate">{apt.patient_name}</div>

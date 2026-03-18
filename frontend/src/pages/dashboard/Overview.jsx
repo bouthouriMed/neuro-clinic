@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Calendar, Users, Clock, TrendingUp, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Calendar, Users, CheckCircle, UserX, ArrowRight } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/StatCard'
 import Card, { CardHeader, CardContent } from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
@@ -8,9 +8,12 @@ import Avatar from '../../components/ui/Avatar'
 import Button from '../../components/ui/Button'
 import { appointmentsApi, usersApi } from '../../services/api'
 
-function formatDate(date) {
+function toLocalDateStr(date) {
   const d = new Date(date)
-  return d.toISOString().split('T')[0]
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 function formatTime(time) {
@@ -23,6 +26,7 @@ function formatTime(time) {
 }
 
 export default function Overview() {
+  const navigate = useNavigate()
   const [appointments, setAppointments] = useState([])
   const [patients, setPatients] = useState([])
   const [loading, setLoading] = useState(true)
@@ -45,13 +49,13 @@ export default function Overview() {
     fetchData()
   }, [])
 
-  const today = formatDate(new Date())
-  const todayAppointments = appointments.filter((a) => formatDate(a.appointment_date) === today)
-  const pendingCount = appointments.filter((a) => a.status === 'pending').length
+  const today = toLocalDateStr(new Date())
+  const todayAppointments = appointments.filter((a) => {
+    const aptDate = a.appointment_date ? a.appointment_date.split('T')[0] : ''
+    return aptDate === today
+  })
   const completedCount = appointments.filter((a) => a.status === 'completed').length
-  const successRate = appointments.length > 0 
-    ? Math.round((completedCount / appointments.length) * 100) 
-    : 0
+  const noShowCount = appointments.filter((a) => a.status === 'no_show').length
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -67,10 +71,18 @@ export default function Overview() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 lg:gap-4">
-        <StatCard label="RDV Aujourd'hui" value={todayAppointments.length} icon={Calendar} color="primary" trend={12} />
-        <StatCard label="Total Patients" value={patients.length} icon={Users} color="accent" trend={8} />
-        <StatCard label="En attente" value={pendingCount} icon={Clock} color="amber" />
-        <StatCard label="Taux de réussite" value={`${successRate}%`} icon={TrendingUp} color="emerald" trend={3} />
+        <div onClick={() => navigate(`/dashboard/appointments?date=${today}`)} className="cursor-pointer">
+          <StatCard label="RDV Aujourd'hui" value={todayAppointments.length} icon={Calendar} color="primary" trend={12} />
+        </div>
+        <div onClick={() => navigate('/dashboard/patients')} className="cursor-pointer">
+          <StatCard label="Total patients" value={patients.length} icon={Users} color="accent" trend={8} />
+        </div>
+        <div onClick={() => navigate('/dashboard/appointments?filter=completed')} className="cursor-pointer">
+          <StatCard label="Terminés" value={completedCount} icon={CheckCircle} color="emerald" />
+        </div>
+        <div onClick={() => navigate('/dashboard/appointments?filter=no_show')} className="cursor-pointer">
+          <StatCard label="Absents" value={noShowCount} icon={UserX} color="amber" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -84,7 +96,7 @@ export default function Overview() {
                   {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               </div>
-              <Link to="/dashboard/appointments">
+              <Link to={`/dashboard/appointments?date=${today}`}>
                 <Button variant="ghost" size="sm" className="text-indigo-600">
                   Voir tout <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
@@ -96,7 +108,11 @@ export default function Overview() {
               ) : (
                 <div className="divide-y divide-slate-100">
                   {todayAppointments.map((apt) => (
-                    <div key={apt.id} className="px-4 lg:px-6 py-3 lg:py-4 flex items-center gap-3 lg:gap-4 hover:bg-slate-50/50 transition-colors">
+                    <div
+                      key={apt.id}
+                      onClick={() => navigate(`/dashboard/appointments?date=${today}`)}
+                      className="px-4 lg:px-6 py-3 lg:py-4 flex items-center gap-3 lg:gap-4 hover:bg-slate-50/50 transition-colors cursor-pointer"
+                    >
                       <div className="w-12 lg:w-14 text-center shrink-0">
                         <span className="text-sm font-semibold text-slate-800">{formatTime(apt.appointment_time)}</span>
                       </div>
@@ -106,7 +122,7 @@ export default function Overview() {
                         <div className="text-xs text-slate-400 truncate hidden sm:block">{apt.service}</div>
                       </div>
                       <Badge variant={apt.status} className="shrink-0">
-                        {apt.status === 'confirmed' ? 'confirmé' : apt.status === 'pending' ? 'en attente' : apt.status === 'completed' ? 'terminé' : 'annulé'}
+                        {apt.status === 'confirmed' ? 'confirmé' : apt.status === 'completed' ? 'terminé' : apt.status === 'no_show' ? 'absent' : apt.status === 'cancelled' ? 'annulé' : apt.status}
                       </Badge>
                     </div>
                   ))}
@@ -135,7 +151,8 @@ export default function Overview() {
                   {appointments.slice(0, 4).map((apt) => (
                     <div
                       key={apt.id}
-                      className="px-4 lg:px-6 py-3 hover:bg-slate-50/50 transition-colors"
+                      onClick={() => navigate(`/dashboard/appointments?search=${encodeURIComponent(apt.patient_name)}`)}
+                      className="px-4 lg:px-6 py-3 hover:bg-slate-50/50 transition-colors cursor-pointer"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -145,7 +162,7 @@ export default function Overview() {
                           </span>
                         </div>
                         <Badge variant={apt.status} className="shrink-0 text-[10px]">
-                          {apt.status}
+                          {apt.status === 'confirmed' ? 'confirmé' : apt.status === 'completed' ? 'terminé' : apt.status === 'no_show' ? 'absent' : apt.status === 'cancelled' ? 'annulé' : apt.status}
                         </Badge>
                       </div>
                     </div>

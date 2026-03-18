@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
       SELECT a.*, u.first_name, u.last_name, u.email as user_email, u.phone as user_phone
       FROM appointments a
       LEFT JOIN users u ON a.user_id = u.id
-      ORDER BY a.appointment_date DESC, a.appointment_time DESC
+      ORDER BY a.seq_id DESC
     `)
     res.json(result.rows)
   } catch (error) {
@@ -21,21 +21,37 @@ router.get('/', async (req, res) => {
 router.get('/available-slots', async (req, res) => {
   try {
     const { date } = req.query
-    
-    const allSlots = [
-      '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-      '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'
-    ]
-    
+
+    // Get day of week from the requested date (0=Sunday, 6=Saturday)
+    // Parse manually to avoid UTC timezone shift
+    const [year, month, day] = date.split('-').map(Number)
+    const dayOfWeek = new Date(year, month - 1, day).getDay()
+
+    // Fetch configured slots for this day
+    const scheduleResult = await query(
+      'SELECT time_slot FROM weekly_schedule WHERE day_of_week = $1 AND is_active = true ORDER BY time_slot',
+      [dayOfWeek]
+    )
+    const allSlots = scheduleResult.rows.map(r => r.time_slot.slice(0, 5))
+
+    // Fetch booked slots
     const result = await query(
-      `SELECT appointment_time FROM appointments 
+      `SELECT appointment_time FROM appointments
        WHERE appointment_date = $1 AND status != 'cancelled'`,
       [date]
     )
-    
-    const bookedTimes = result.rows.map(row => row.appointment_time)
-    const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot))
-    
+
+    const bookedTimes = result.rows.map(row => row.appointment_time.slice(0, 5))
+    let availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot))
+
+    // If the requested date is today, filter out past time slots
+    const todayStr = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD local
+    if (date === todayStr) {
+      const now = new Date()
+      const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+      availableSlots = availableSlots.filter(slot => slot > currentTime)
+    }
+
     res.json({ date, slots: availableSlots })
   } catch (error) {
     console.error('Error fetching slots:', error)
@@ -63,7 +79,7 @@ router.post('/', async (req, res) => {
     
     const result = await query(
       `INSERT INTO appointments (user_id, patient_name, patient_phone, patient_email, service, appointment_date, appointment_time, notes, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'confirmed')
        RETURNING *`,
       [linkedUserId || null, patientName, patientPhone, patientEmail || null, service, date, time, notes || null]
     )
@@ -71,11 +87,12 @@ router.post('/', async (req, res) => {
     const appointment = result.rows[0]
 
     // Create notification for new appointment
-    const dateStr = new Date(appointment.appointment_date).toLocaleDateString('fr-FR')
+    const [y, m, d] = appointment.appointment_date.toISOString().split('T')[0].split('-')
+    const dateStr = `${d}/${m}/${y}`
     const timeStr = appointment.appointment_time.slice(0, 5)
     await query(
       `INSERT INTO notifications (type, message) VALUES ($1, $2)`,
-      ['appointment', `Nouveau rendez-vous de ${appointment.patient_name} le ${dateStr} à ${timeStr} - ${appointment.service}`]
+      ['appointment', `Rendez-vous confirmé de ${appointment.patient_name} le ${dateStr} à ${timeStr} - ${appointment.service}`]
     )
 
     res.status(201).json({

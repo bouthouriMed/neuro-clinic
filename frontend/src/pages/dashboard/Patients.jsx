@@ -168,21 +168,21 @@ export default function Patients() {
                     <div className="flex gap-1">
                       <button 
                         onClick={() => viewPatientAppointments(patient)}
-                        className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                        className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors cursor-pointer active:scale-95"
                         title="Voir les RDV"
                       >
                         <Calendar className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => openEditModal(patient)}
-                        className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                        className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors cursor-pointer active:scale-95"
                         title="Modifier"
                       >
                         ✏️
                       </button>
                       <button 
                         onClick={() => deletePatient(patient.id)}
-                        className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer active:scale-95"
                         title="Supprimer"
                       >
                         <Trash2 className="w-4 h-4" />

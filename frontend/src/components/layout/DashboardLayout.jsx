@@ -24,7 +24,7 @@ export default function DashboardLayout() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       <DashboardSidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -55,18 +55,18 @@ export default function DashboardLayout() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="relative hidden sm:block">
+            {/* <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Rechercher patients, rendez-vous..."
                 className="w-64 xl:w-72 pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
               />
-            </div>
+            </div> */}
             {/* Mobile search icon */}
-            <button className="sm:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
+            {/* <button className="sm:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
               <Search className="w-5 h-5" />
-            </button>
+            </button> */}
           </div>
 
           <div className="flex items-center gap-2">

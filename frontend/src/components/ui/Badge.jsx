@@ -3,6 +3,7 @@ const variants = {
   pending: 'bg-amber-50 text-amber-700 border-amber-200',
   completed: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   cancelled: 'bg-red-50 text-red-600 border-red-200',
+  no_show: 'bg-orange-50 text-orange-700 border-orange-200',
   default: 'bg-slate-100 text-slate-600 border-slate-200',
 }
 

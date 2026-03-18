@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
-import { Search, Check, X, Plus, Calendar, Trash2 } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { Search, Check, X, Plus, Calendar, Trash2, Phone, MessageCircle, Pencil, MoreVertical, UserX } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Avatar from '../../components/ui/Avatar'
@@ -8,7 +9,16 @@ import Modal from '../../components/ui/Modal'
 import Input from '../../components/ui/Input'
 import { appointmentsApi } from '../../services/api'
 
-const filters = ['All', 'pending', 'confirmed', 'completed', 'cancelled']
+const filters = ['All', 'confirmed', 'completed', 'no_show', 'cancelled']
+
+const statusLabels = {
+  All: 'Tous',
+  confirmed: 'Confirmé',
+  completed: 'Terminé',
+  no_show: 'Absent',
+  cancelled: 'Annulé',
+  pending: 'En attente',
+}
 
 const services = [
   'Consultation neurologique',
@@ -31,8 +41,10 @@ function formatTime(time) {
 }
 
 export default function Appointments() {
-  const [activeFilter, setActiveFilter] = useState('All')
-  const [search, setSearch] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [activeFilter, setActiveFilter] = useState(searchParams.get('filter') || 'All')
+  const [search, setSearch] = useState(searchParams.get('search') || '')
+  const [dateFilter, setDateFilter] = useState(searchParams.get('date') || '')
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -48,6 +60,8 @@ export default function Appointments() {
   })
   const [saving, setSaving] = useState(false)
   const [availableSlots, setAvailableSlots] = useState([])
+  const [openMenuId, setOpenMenuId] = useState(null)
+  const menuRef = useRef(null)
 
   useEffect(() => {
     loadAppointments()
@@ -58,6 +72,16 @@ export default function Appointments() {
       loadAvailableSlots(formData.date)
     }
   }, [formData.date])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const loadAppointments = async () => {
     try {
@@ -85,7 +109,8 @@ export default function Appointments() {
       a.patient_name?.toLowerCase().includes(search.toLowerCase()) ||
       a.service?.toLowerCase().includes(search.toLowerCase()) ||
       a.patient_phone?.includes(search)
-    return matchFilter && matchSearch
+    const matchDate = !dateFilter || (a.appointment_date && a.appointment_date.split('T')[0] === dateFilter)
+    return matchFilter && matchSearch && matchDate
   })
 
   const updateStatus = async (id, status) => {
@@ -107,6 +132,29 @@ export default function Appointments() {
     } catch (error) {
       console.error('Error deleting appointment:', error)
     }
+  }
+
+  const formatPhoneForWhatsApp = (phone) => {
+    if (!phone) return ''
+    let cleaned = phone.replace(/[\s\-()]/g, '')
+    if (!cleaned.startsWith('+') && !cleaned.startsWith('216')) {
+      cleaned = '216' + cleaned
+    }
+    return cleaned.replace('+', '')
+  }
+
+  const sendWhatsApp = (apt) => {
+    const phone = formatPhoneForWhatsApp(apt.patient_phone)
+    const date = new Date(apt.appointment_date + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+    const time = formatTime(apt.appointment_time)
+    const msg = encodeURIComponent(
+      `Bonjour ${apt.patient_name},\n\nNous confirmons votre rendez-vous au cabinet de neurologie Dr. Abir Bouthouri :\n\n📅 ${date}\n🕐 ${time}\n📍 Avenue Ibn Eljazzar, Centre médical 'Le carré Blanc', 8ème étage, bureau B82\n\nMerci de nous contacter en cas d'empêchement.\nCordialement, Cabinet de Neurologie`
+    )
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank')
+  }
+
+  const callPatient = (apt) => {
+    window.open(`tel:${apt.patient_phone}`, '_self')
   }
 
   const openCreateModal = () => {
@@ -194,6 +242,23 @@ export default function Appointments() {
             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
           />
         </div>
+        <div className="relative">
+          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="pl-10 pr-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+          />
+          {dateFilter && (
+            <button
+              onClick={() => setDateFilter('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
         <div className="flex gap-1 bg-slate-100 rounded-xl p-1 overflow-x-auto">
           {filters.map((f) => (
             <button
@@ -205,7 +270,7 @@ export default function Appointments() {
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              {f === 'All' ? 'Tous' : f}
+              {statusLabels[f] || f}
             </button>
           ))}
         </div>
@@ -247,31 +312,68 @@ export default function Appointments() {
                       <td className="px-6 py-4 text-sm font-medium text-slate-800">{formatTime(apt.appointment_time)}</td>
                       <td className="px-6 py-4 text-sm text-slate-500 max-w-[200px] truncate">{apt.service}</td>
                       <td className="px-6 py-4">
-                        <Badge variant={apt.status}>{apt.status}</Badge>
+                        <Badge variant={apt.status}>{statusLabels[apt.status] || apt.status}</Badge>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
-                          {apt.status === 'pending' && (
-                            <>
-                              <Button variant="ghost" size="sm" onClick={() => updateStatus(apt.id, 'confirmed')} className="text-emerald-600 hover:bg-emerald-50">
-                                <Check className="w-4 h-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => updateStatus(apt.id, 'cancelled')} className="text-red-500 hover:bg-red-50">
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </>
-                          )}
-                          {apt.status === 'confirmed' && (
-                            <Button variant="ghost" size="sm" onClick={() => updateStatus(apt.id, 'completed')} className="text-indigo-600 hover:bg-indigo-50">
-                              <Check className="w-4 h-4" /> Terminé
-                            </Button>
-                          )}
-                          <Button variant="ghost" size="sm" onClick={() => openEditModal(apt)} className="text-slate-400 hover:text-slate-600">
-                            ✏️
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => deleteAppointment(apt.id)} className="text-red-400 hover:text-red-600">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          {/* Quick contact actions always visible */}
+                          <button
+                            onClick={() => sendWhatsApp(apt)}
+                            title="Envoyer WhatsApp"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-green-600 bg-green-50 hover:bg-green-100 transition-colors cursor-pointer"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => callPatient(apt)}
+                            title="Appeler"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer"
+                          >
+                            <Phone className="w-4 h-4" />
+                          </button>
+
+                          {/* More actions dropdown */}
+                          <div className="relative" ref={openMenuId === apt.id ? menuRef : null}>
+                            <button
+                              onClick={() => setOpenMenuId(openMenuId === apt.id ? null : apt.id)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+                            {openMenuId === apt.id && (
+                              <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-1 z-50 animate-fade-in-up">
+                                {apt.status === 'confirmed' && (
+                                  <>
+                                    <button
+                                      onClick={() => { updateStatus(apt.id, 'completed'); setOpenMenuId(null) }}
+                                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer"
+                                    >
+                                      <Check className="w-4 h-4" /> Terminé
+                                    </button>
+                                    <button
+                                      onClick={() => { updateStatus(apt.id, 'no_show'); setOpenMenuId(null) }}
+                                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 transition-colors cursor-pointer"
+                                    >
+                                      <UserX className="w-4 h-4" /> Absent
+                                    </button>
+                                    <button
+                                      onClick={() => { updateStatus(apt.id, 'cancelled'); setOpenMenuId(null) }}
+                                      className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                                    >
+                                      <X className="w-4 h-4" /> Annuler
+                                    </button>
+                                    <div className="h-px bg-slate-100 my-1" />
+                                  </>
+                                )}
+                                <button
+                                  onClick={() => { deleteAppointment(apt.id); setOpenMenuId(null) }}
+                                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Supprimer
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -299,7 +401,7 @@ export default function Appointments() {
                       <div className="text-xs text-slate-400">{apt.patient_phone}</div>
                     </div>
                   </div>
-                  <Badge variant={apt.status}>{apt.status}</Badge>
+                  <Badge variant={apt.status}>{statusLabels[apt.status] || apt.status}</Badge>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-4 text-slate-600">
@@ -311,28 +413,55 @@ export default function Appointments() {
                   </div>
                 </div>
                 <div className="text-sm text-slate-500 line-clamp-2">{apt.service}</div>
+                {/* Contact actions */}
                 <div className="flex gap-2 pt-2 border-t border-slate-100">
-                  {apt.status === 'pending' && (
+                  <button
+                    onClick={() => sendWhatsApp(apt)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <MessageCircle className="w-4 h-4" /> WhatsApp
+                  </button>
+                  <button
+                    onClick={() => callPatient(apt)}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Phone className="w-4 h-4" /> Appeler
+                  </button>
+                </div>
+
+                {/* Status & edit actions */}
+                <div className="flex gap-2">
+                  {apt.status === 'confirmed' && (
                     <>
-                      <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'confirmed')} className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50">
-                        <Check className="w-4 h-4 mr-1" /> Confirmer
+                      <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'completed')} className="flex-1 text-emerald-600 border-emerald-200 hover:bg-emerald-50">
+                        <Check className="w-4 h-4 mr-1" /> Terminé
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'cancelled')} className="flex-1 text-red-500 border-red-200 hover:bg-red-50">
-                        <X className="w-4 h-4 mr-1" /> Annuler
+                      <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'no_show')} className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50">
+                        <UserX className="w-4 h-4 mr-1" /> Absent
                       </Button>
                     </>
-                  )}
-                  {apt.status === 'confirmed' && (
-                    <Button variant="outline" size="sm" onClick={() => updateStatus(apt.id, 'completed')} className="flex-1 text-indigo-600 border-indigo-200 hover:bg-indigo-50">
-                      <Check className="w-4 h-4 mr-1" /> Terminer
-                    </Button>
                   )}
                   {apt.status === 'completed' && (
                     <span className="text-sm text-slate-400 py-2">Terminé</span>
                   )}
+                  {apt.status === 'no_show' && (
+                    <span className="text-sm text-orange-500 py-2">Absent</span>
+                  )}
                   {apt.status === 'cancelled' && (
                     <span className="text-sm text-slate-400 py-2">Annulé</span>
                   )}
+                  <button
+                    onClick={() => openEditModal(apt)}
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => deleteAppointment(apt.id)}
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </Card>
             ))}

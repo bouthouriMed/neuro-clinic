@@ -55,6 +55,7 @@ export const initDatabase = async () => {
     await client.query(`
       CREATE TABLE IF NOT EXISTS appointments (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        seq_id SERIAL,
         user_id UUID,
         patient_name VARCHAR(200) NOT NULL,
         patient_phone VARCHAR(20) NOT NULL,
@@ -76,6 +77,16 @@ export const initDatabase = async () => {
     
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status)
+    `)
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS weekly_schedule (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+        time_slot TIME NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        UNIQUE(day_of_week, time_slot)
+      )
     `)
 
     await client.query(`

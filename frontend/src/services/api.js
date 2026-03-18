@@ -46,6 +46,12 @@ export const appointmentsApi = {
   delete: (id) => fetchApi(`/api/appointments/${id}`, { method: 'DELETE' }),
 }
 
+export const scheduleApi = {
+  getAll: () => fetchApi('/api/schedule'),
+  getDay: (dayOfWeek) => fetchApi(`/api/schedule/day/${dayOfWeek}`),
+  updateDay: (dayOfWeek, slots) => fetchApi(`/api/schedule/day/${dayOfWeek}`, { method: 'PUT', body: { slots } }),
+}
+
 export const notificationsApi = {
   getAll: () => fetchApi('/api/notifications'),
   markRead: (id) => fetchApi(`/api/notifications/${id}/read`, { method: 'PUT' }),

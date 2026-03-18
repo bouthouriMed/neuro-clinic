@@ -5,6 +5,7 @@ import {
   Calendar,
   Users,
   Bell,
+  Clock,
   LogOut,
   ChevronLeft,
   X,
@@ -14,6 +15,7 @@ const navItems = [
   { to: '/dashboard/appointments', icon: Calendar, label: 'Rendez-vous' },
   { to: '/dashboard/patients', icon: Users, label: 'Patients' },
   { to: '/dashboard/calendar', icon: Calendar, label: 'Calendrier' },
+  { to: '/dashboard/schedule', icon: Clock, label: 'Horaires' },
   { to: '/dashboard/notifications', icon: Bell, label: 'Notifications' },
 ]
 
@@ -46,7 +48,7 @@ export default function DashboardSidebar({ collapsed, mobileOpen, onToggle, onMo
       <div className="h-16 flex items-center px-5 border-b border-slate-800 gap-3">
         <button 
           onClick={onMobileClose}
-          className="lg:hidden absolute top-4 right-4 p-1 text-slate-400 hover:text-white transition-colors"
+          className="lg:hidden absolute top-4 right-4 p-1 text-slate-400 hover:text-white transition-colors cursor-pointer active:scale-95"
         >
           <X className="w-5 h-5" />
         </button>
