@@ -62,7 +62,7 @@ export default function Login() {
                     setError('')
                   }}
                   placeholder="votre@email.com"
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all autofill-fix"
                   autoFocus
                   required
                 />
@@ -83,7 +83,7 @@ export default function Login() {
                     setError('')
                   }}
                   placeholder="Entrez votre mot de passe"
-                  className="w-full pl-12 pr-12 py-3.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  className="w-full pl-12 pr-12 py-3.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all autofill-fix"
                   required
                 />
                 <button

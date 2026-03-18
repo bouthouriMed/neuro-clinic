@@ -17,6 +17,15 @@ body {
   overflow-x: hidden;
 }
 
+/* ========== AUTOFILL FIX ========== */
+.autofill-fix:-webkit-autofill,
+.autofill-fix:-webkit-autofill:hover,
+.autofill-fix:-webkit-autofill:focus {
+  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.05) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* ========== KEYFRAME ANIMATIONS ========== */
 
 @keyframes float {

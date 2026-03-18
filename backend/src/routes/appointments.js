@@ -1,7 +1,37 @@
 import express from 'express'
 import { query } from '../config/database.js'
+import { sendConfirmationEmail, sendVerificationEmail, generateCode, storeCode, verifyCode } from '../services/email.js'
 
 const router = express.Router()
+
+// Send verification code to email
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { email } = req.body
+    if (!email) return res.status(400).json({ error: 'Email requis' })
+
+    const code = generateCode()
+    storeCode(email, code)
+    await sendVerificationEmail({ to: email, code })
+
+    res.json({ message: 'Code envoyé' })
+  } catch (error) {
+    console.error('Error sending verification email:', error)
+    res.status(500).json({ error: 'Erreur lors de l\'envoi du code' })
+  }
+})
+
+// Verify the code
+router.post('/verify-code', (req, res) => {
+  const { email, code } = req.body
+  if (!email || !code) return res.status(400).json({ error: 'Email et code requis' })
+
+  if (verifyCode(email, code)) {
+    res.json({ verified: true })
+  } else {
+    res.status(400).json({ verified: false, error: 'Code invalide ou expiré' })
+  }
+})
 
 router.get('/', async (req, res) => {
   try {
@@ -94,6 +124,18 @@ router.post('/', async (req, res) => {
       `INSERT INTO notifications (type, message) VALUES ($1, $2)`,
       ['appointment', `Rendez-vous confirmé de ${appointment.patient_name} le ${dateStr} à ${timeStr} - ${appointment.service}`]
     )
+
+    // Send confirmation email (non-blocking)
+    if (appointment.patient_email) {
+      const aptDate = appointment.appointment_date.toISOString().split('T')[0]
+      sendConfirmationEmail({
+        to: appointment.patient_email,
+        patientName: appointment.patient_name,
+        date: aptDate,
+        time: timeStr,
+        service: appointment.service,
+      }).catch(err => console.error('Email send failed:', err.message))
+    }
 
     res.status(201).json({
       message: 'Appointment created successfully',

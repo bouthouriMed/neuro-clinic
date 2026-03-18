@@ -44,6 +44,8 @@ export const appointmentsApi = {
   create: (data) => fetchApi('/api/appointments', { method: 'POST', body: data }),
   update: (id, data) => fetchApi(`/api/appointments/${id}`, { method: 'PUT', body: data }),
   delete: (id) => fetchApi(`/api/appointments/${id}`, { method: 'DELETE' }),
+  sendVerificationCode: (email) => fetchApi('/api/appointments/verify-email', { method: 'POST', body: { email } }),
+  verifyCode: (email, code) => fetchApi('/api/appointments/verify-code', { method: 'POST', body: { email, code } }),
 }
 
 export const scheduleApi = {
