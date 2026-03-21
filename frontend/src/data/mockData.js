@@ -313,31 +313,31 @@ export const notifications = [
 export const testimonials = [
   {
     name: 'Mohamed Ben Abdallah',
-    text: "Le Dr. Bouthouri est un excellent neurologue. Il a réussi à diagnostiquer ma maladie de Parkinson après plusieurs années d'errance médicale. Son expertise et sa compassion ont changé ma vie.",
+    text: "Le Dr. Bouthouri est une excellente neurologue. Elle a réussi à diagnostiquer ma maladie de Parkinson après plusieurs années d'errance médicale. Son expertise et sa compassion ont changé ma vie.",
     rating: 5,
     condition: 'Maladie de Parkinson',
   },
   {
     name: 'Sana Kraiem',
-    text: "Depuis que je suis suivie par le Dr. Bouthouri pour mon épilepsie, je vis normalement. Il a trouvé le bon traitement et me supervise parfaitement. Je recommande fortement.",
+    text: "Depuis que je suis suivie par le Dr. Bouthouri pour mon épilepsie, je vis normalement. Elle a trouvé le bon traitement et me supervise parfaitement. Je recommande fortement.",
     rating: 5,
     condition: 'Épilepsie',
   },
   {
     name: 'Rachid Amri',
-    text: 'J\'ai souffert de migraines chroniques pendant des années. Le Dr. Bouthouri a identifié la cause et m\'a prescrit un traitement efficace. Enfin je peux travailler sans douleur.',
+    text: "J'ai souffert de migraines chroniques pendant des années. Le Dr. Bouthouri a identifié la cause et m'a prescrit un traitement efficace. Enfin je peux travailler sans douleur.",
     rating: 5,
     condition: 'Migraines Chroniques',
   },
   {
     name: 'Leïla Ben Hassine',
-    text: 'Mon père était atteint de la maladie d\'Alzheimer. Le Dr. Bouthouri a été d\'un soutien immense pour toute la famille. Il est patient, à l\'écoute et très compétent.',
+    text: "Mon père était atteint de la maladie d'Alzheimer. Le Dr. Bouthouri a été d'un soutien immense pour toute la famille. Elle est patiente, à l'écoute et très compétente.",
     rating: 5,
-    condition: 'Maladie d\'Alzheimer',
+    condition: "Maladie d'Alzheimer",
   },
   {
     name: 'Karim Znidi',
-    text: 'Excellent médecin! Il a détecté mon AVC à temps et a immédiatemment commencé le traitement. Son expertise en neurologie vasculaire est remarquable.',
+    text: "Excellente médecin ! Elle a détecté mon AVC à temps et a immédiatement commencé le traitement. Son expertise en neurologie vasculaire est remarquable.",
     rating: 5,
     condition: 'Accident Vasculaire Cérébral',
   },
