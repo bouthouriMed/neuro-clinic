@@ -6,6 +6,12 @@ import { scheduleApi } from '../../services/api'
 
 const DAY_LABELS = { 1: 'Lun', 2: 'Mar', 3: 'Mer', 4: 'Jeu', 5: 'Ven', 6: 'Sam' }
 
+function addThirtyMin(time) {
+  const [h, m] = time.split(':').map(Number)
+  const total = h * 60 + m + 30
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+
 function formatHoursFromSchedule(schedule) {
   // Group days by their time ranges
   const dayRanges = {}
@@ -15,8 +21,8 @@ function formatHoursFromSchedule(schedule) {
     const morning = slots.filter(s => s < '13:30')
     const afternoon = slots.filter(s => s >= '13:30')
     const parts = []
-    if (morning.length > 0) parts.push(`${morning[0].replace(':', 'h')} - ${morning[morning.length - 1].replace(':', 'h')}`)
-    if (afternoon.length > 0) parts.push(`${afternoon[0].replace(':', 'h')} - ${afternoon[afternoon.length - 1].replace(':', 'h')}`)
+    if (morning.length > 0) parts.push(`${morning[0].replace(':', 'h')} - ${addThirtyMin(morning[morning.length - 1]).replace(':', 'h')}`)
+    if (afternoon.length > 0) parts.push(`${afternoon[0].replace(':', 'h')} - ${addThirtyMin(afternoon[afternoon.length - 1]).replace(':', 'h')}`)
     const range = parts.join(' & ')
     dayRanges[day] = range
   }

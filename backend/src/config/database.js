@@ -99,6 +99,11 @@ export const initDatabase = async () => {
       )
     `)
 
+    // Remove 16:30 weekday slots (last bookable slot is 16:00)
+    await client.query(
+      `DELETE FROM weekly_schedule WHERE day_of_week BETWEEN 1 AND 5 AND time_slot = '16:30:00'`
+    )
+
     console.log('Database tables created successfully')
   } finally {
     client.release()
