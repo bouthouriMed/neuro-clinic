@@ -19,8 +19,19 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1)
 }
 
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map(o => o.trim())
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`)
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true
 }))
 

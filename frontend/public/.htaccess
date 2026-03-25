@@ -1,6 +1,16 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Redirect non-www to www
+  RewriteCond %{HTTP_HOST} ^drabirneuroclinic\.tn$ [NC]
+  RewriteRule ^ https://www.drabirneuroclinic.tn%{REQUEST_URI} [L,R=301]
+
+  # SPA fallback
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
